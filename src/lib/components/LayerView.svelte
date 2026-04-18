@@ -180,7 +180,6 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		padding: 4px;
 		white-space: pre-wrap;
 		word-break: break-word;
 		outline: none;
