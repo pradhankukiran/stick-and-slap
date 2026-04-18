@@ -358,7 +358,7 @@
 	{#if scene.layers.length === 0 && !dragging}
 		<div class="empty" aria-hidden="true">
 			<span class="empty-title">drop a pic</span>
-			<span class="empty-sub">or press T to type, R for rect, S for sticker</span>
+			<span class="empty-sub">or press T for text, R/C/B/X/A for shapes</span>
 		</div>
 	{/if}
 
