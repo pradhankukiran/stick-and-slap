@@ -5,6 +5,8 @@
 	import EditorCanvas from '$lib/components/EditorCanvas.svelte';
 	import ExportDialog from '$lib/components/ExportDialog.svelte';
 	import Toolbar from '$lib/components/Toolbar.svelte';
+	import LayerPanel from '$lib/components/LayerPanel.svelte';
+	import Inspector from '$lib/components/Inspector.svelte';
 </script>
 
 <svelte:head>
@@ -24,6 +26,10 @@
 		{/snippet}
 		{#snippet canvas()}
 			<EditorCanvas />
+		{/snippet}
+		{#snippet panels()}
+			<LayerPanel />
+			<Inspector />
 		{/snippet}
 	</Stage>
 {/if}
