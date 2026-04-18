@@ -126,7 +126,7 @@
 
 <div class="toolbar">
 	<div class="group">
-		<StickyButton color="paper" size="md" square onclick={() => fileInput.click()}>
+		<StickyButton color="paper" size="md" square ariaLabel="Add image" onclick={() => fileInput.click()}>
 			{#snippet children()}<span class="icon" title="Image">🖼</span>{/snippet}
 		</StickyButton>
 		<input
@@ -137,27 +137,27 @@
 			onchange={onFileChange}
 		/>
 
-		<StickyButton color="yellow" size="md" square onclick={addText}>
+		<StickyButton color="yellow" size="md" square ariaLabel="Add text layer" onclick={addText}>
 			{#snippet children()}<span class="letter">T</span>{/snippet}
 		</StickyButton>
 
-		<StickyButton color="pink" size="md" square onclick={() => addShape('rect')}>
+		<StickyButton color="pink" size="md" square ariaLabel="Add rectangle" onclick={() => addShape('rect')}>
 			{#snippet children()}<span class="letter">▢</span>{/snippet}
 		</StickyButton>
 
-		<StickyButton color="cobalt" size="md" square onclick={() => addShape('circle')}>
+		<StickyButton color="cobalt" size="md" square ariaLabel="Add circle" onclick={() => addShape('circle')}>
 			{#snippet children()}<span class="letter">◯</span>{/snippet}
 		</StickyButton>
 
-		<StickyButton color="mint" size="md" square onclick={() => addShape('speech')}>
+		<StickyButton color="mint" size="md" square ariaLabel="Add speech bubble" onclick={() => addShape('speech')}>
 			{#snippet children()}<span class="letter">💬</span>{/snippet}
 		</StickyButton>
 
-		<StickyButton color="tangerine" size="md" square onclick={() => addShape('star')}>
+		<StickyButton color="tangerine" size="md" square ariaLabel="Add star" onclick={() => addShape('star')}>
 			{#snippet children()}<span class="letter">★</span>{/snippet}
 		</StickyButton>
 
-		<StickyButton color="lilac" size="md" square onclick={() => addShape('arrow')}>
+		<StickyButton color="lilac" size="md" square ariaLabel="Add arrow" onclick={() => addShape('arrow')}>
 			{#snippet children()}<span class="letter">→</span>{/snippet}
 		</StickyButton>
 	</div>
@@ -169,6 +169,7 @@
 			color="paper"
 			size="sm"
 			square
+			ariaLabel="Undo"
 			disabled={!history.canUndo}
 			onclick={() => history.undo()}
 		>
@@ -178,6 +179,7 @@
 			color="paper"
 			size="sm"
 			square
+			ariaLabel="Redo"
 			disabled={!history.canRedo}
 			onclick={() => history.redo()}
 		>
@@ -187,6 +189,7 @@
 			color={ui.snapEnabled ? 'mint' : 'paper'}
 			size="sm"
 			square
+			ariaLabel="Toggle snap-to-guides"
 			onclick={() => ui.toggleSnap()}
 		>
 			{#snippet children()}<span class="snap">SNAP</span>{/snippet}

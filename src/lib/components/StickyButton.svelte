@@ -6,6 +6,7 @@
 
 	interface Props {
 		label?: string;
+		ariaLabel?: string;
 		color?: Color;
 		size?: Size;
 		disabled?: boolean;
@@ -18,6 +19,7 @@
 
 	let {
 		label,
+		ariaLabel,
 		color = 'paper',
 		size = 'md',
 		disabled = false,
@@ -37,6 +39,7 @@
 	data-active={active}
 	data-shadow={shadowColor}
 	data-square={square}
+	aria-label={ariaLabel}
 	{disabled}
 	{onclick}
 >
