@@ -163,8 +163,11 @@
 	}
 
 	.sticky:focus-visible {
-		outline: 3px solid var(--color-cobalt);
-		outline-offset: 4px;
+		outline: none;
+		box-shadow:
+			0 0 0 2px var(--color-paper),
+			0 0 0 5px var(--color-ink),
+			var(--shadow);
 	}
 
 	@media (prefers-reduced-motion: reduce) {
