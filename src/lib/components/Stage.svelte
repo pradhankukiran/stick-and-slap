@@ -3,6 +3,7 @@
 	import { exporter } from '$lib/state/export.svelte';
 	import { scene } from '$lib/state/scene.svelte';
 	import { ui } from '$lib/state/ui.svelte';
+	import { history } from '$lib/state/history.svelte';
 	import StickyButton from './StickyButton.svelte';
 	import Scribble from './Scribble.svelte';
 
@@ -15,8 +16,13 @@
 	let { toolbar, canvas, panels }: Props = $props();
 
 	function eject() {
+		if (scene.layers.length > 0) {
+			const ok = confirm('start a new canvas? your current work will be lost.');
+			if (!ok) return;
+		}
 		scene.reset();
 		ui.modePicked = false;
+		history.clear();
 	}
 </script>
 
