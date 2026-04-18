@@ -49,7 +49,7 @@
 		return {
 			onstart: (info: DragInfo) => {
 				const layer = single;
-				if (!layer) return;
+				if (!layer || layer.locked) return;
 				history.commit();
 				dragStart = {
 					layers: [{ layer, snapshot: { ...layer } }],
@@ -59,6 +59,7 @@
 			},
 			ondrag: (info: DragInfo) => {
 				if (!dragStart || !single) return;
+				if (single.locked) return;
 				const canvasEl = document.querySelector('.canvas') as HTMLElement | null;
 				if (!canvasEl) return;
 				const rect = canvasEl.getBoundingClientRect();
@@ -182,7 +183,7 @@
 		return {
 			onstart: (info: DragInfo) => {
 				const layer = single;
-				if (!layer) return;
+				if (!layer || layer.locked) return;
 				const canvasEl = document.querySelector('.canvas') as HTMLElement | null;
 				if (!canvasEl) return;
 				history.commit();
@@ -199,6 +200,7 @@
 			},
 			ondrag: (info: DragInfo) => {
 				if (!dragStart || !single) return;
+				if (single.locked) return;
 				const canvasEl = document.querySelector('.canvas') as HTMLElement | null;
 				if (!canvasEl) return;
 				const rect = canvasEl.getBoundingClientRect();
