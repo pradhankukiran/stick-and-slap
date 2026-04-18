@@ -61,6 +61,7 @@
 				if (!dragStart) return;
 				const first = dragStart.layers[0];
 				if (!first || first.snapshot.locked) return;
+				const snapshot = first.snapshot;
 				const canvasEl = document.querySelector('.canvas') as HTMLElement | null;
 				if (!canvasEl) return;
 				const rect = canvasEl.getBoundingClientRect();
@@ -69,9 +70,36 @@
 					uniform: info.shiftKey,
 					fromCenter: info.altKey
 				});
-				scene.updateLayer(first.snapshot.id, {
-					x: next.x,
-					y: next.y,
+
+				let nx = next.x;
+				let ny = next.y;
+
+				if (ui.snapEnabled && !info.altKey) {
+					const resultBBox = layerBBox({
+						x: next.x,
+						y: next.y,
+						w: next.w,
+						h: next.h,
+						rotation: snapshot.rotation
+					});
+					const others = scene.layers
+						.filter((l) => l.id !== snapshot.id && !l.hidden)
+						.map((l) => layerBBox(l));
+					const snap = snapBBox(resultBBox, {
+						canvasW: scene.width,
+						canvasH: scene.height,
+						otherBBoxes: others
+					});
+					nx += snap.dx;
+					ny += snap.dy;
+					ui.activeGuides = snap.guides;
+				} else {
+					ui.activeGuides = [];
+				}
+
+				scene.updateLayer(snapshot.id, {
+					x: nx,
+					y: ny,
 					w: next.w,
 					h: next.h
 				});
