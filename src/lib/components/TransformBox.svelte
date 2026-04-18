@@ -58,8 +58,9 @@
 				};
 			},
 			ondrag: (info: DragInfo) => {
-				if (!dragStart || !single) return;
-				if (single.locked) return;
+				if (!dragStart) return;
+				const first = dragStart.layers[0];
+				if (!first || first.snapshot.locked) return;
 				const canvasEl = document.querySelector('.canvas') as HTMLElement | null;
 				if (!canvasEl) return;
 				const rect = canvasEl.getBoundingClientRect();
@@ -68,7 +69,7 @@
 					uniform: info.shiftKey,
 					fromCenter: info.altKey
 				});
-				scene.updateLayer(single.id, {
+				scene.updateLayer(first.snapshot.id, {
 					x: next.x,
 					y: next.y,
 					w: next.w,
@@ -199,8 +200,9 @@
 				};
 			},
 			ondrag: (info: DragInfo) => {
-				if (!dragStart || !single) return;
-				if (single.locked) return;
+				if (!dragStart) return;
+				const first = dragStart.layers[0];
+				if (!first || first.snapshot.locked) return;
 				const canvasEl = document.querySelector('.canvas') as HTMLElement | null;
 				if (!canvasEl) return;
 				const rect = canvasEl.getBoundingClientRect();
@@ -210,7 +212,7 @@
 				const currentAngle = angleTo({ x: centerX, y: centerY }, pointer);
 				const startAngle = dragStart.pointer.x;
 				const next = applyRotation(dragStart.rect.rotation, startAngle, currentAngle, info.shiftKey);
-				scene.updateLayer(single.id, { rotation: next });
+				scene.updateLayer(first.snapshot.id, { rotation: next });
 			},
 			onend: () => {
 				dragStart = null;
