@@ -4,6 +4,7 @@
 	import { ui } from '$lib/state/ui.svelte';
 	import LayerView from './LayerView.svelte';
 	import TransformBox from './TransformBox.svelte';
+	import { layerBBox, bboxIntersects } from '$lib/geom/bbox';
 	import { onMount } from 'svelte';
 
 	let stageEl: HTMLDivElement;
@@ -90,6 +91,52 @@
 	function onBackgroundClick(e: MouseEvent) {
 		if (e.target === canvasEl) selection.clear();
 	}
+
+	// Marquee selection
+	let marquee = $state<{ x: number; y: number; w: number; h: number } | null>(null);
+	let marqueeStart: { x: number; y: number } | null = null;
+	let marqueeAdd = false;
+
+	function onCanvasPointerDown(e: PointerEvent) {
+		if (e.target !== canvasEl) return;
+		if (e.button !== 0) return;
+		const rect = canvasEl.getBoundingClientRect();
+		const local = { x: (e.clientX - rect.left) / scale, y: (e.clientY - rect.top) / scale };
+		marqueeStart = local;
+		marquee = { x: local.x, y: local.y, w: 0, h: 0 };
+		marqueeAdd = e.shiftKey;
+		canvasEl.setPointerCapture(e.pointerId);
+		window.addEventListener('pointermove', onMarqueeMove);
+		window.addEventListener('pointerup', onMarqueeUp);
+	}
+
+	function onMarqueeMove(e: PointerEvent) {
+		if (!marqueeStart || !canvasEl) return;
+		const rect = canvasEl.getBoundingClientRect();
+		const now = { x: (e.clientX - rect.left) / scale, y: (e.clientY - rect.top) / scale };
+		marquee = {
+			x: Math.min(marqueeStart.x, now.x),
+			y: Math.min(marqueeStart.y, now.y),
+			w: Math.abs(now.x - marqueeStart.x),
+			h: Math.abs(now.y - marqueeStart.y)
+		};
+	}
+
+	function onMarqueeUp() {
+		if (marquee && marquee.w > 2 && marquee.h > 2) {
+			const hits = scene.layers
+				.filter((l) => !l.hidden && !l.locked && bboxIntersects(marquee!, layerBBox(l)))
+				.map((l) => l.id);
+			if (marqueeAdd) selection.addRange(hits);
+			else selection.setMany(hits);
+		} else if (!marqueeAdd) {
+			selection.clear();
+		}
+		marqueeStart = null;
+		marquee = null;
+		window.removeEventListener('pointermove', onMarqueeMove);
+		window.removeEventListener('pointerup', onMarqueeUp);
+	}
 </script>
 
 <div
@@ -106,6 +153,7 @@
 		bind:this={canvasEl}
 		style="--w: {scene.width}px; --h: {scene.height}px; --scale: {scale}; --bg: {scene.background}"
 		onclick={onBackgroundClick}
+		onpointerdown={onCanvasPointerDown}
 		role="presentation"
 	>
 		{#each scene.layers as layer (layer.id)}
@@ -116,6 +164,14 @@
 
 		{#if !selection.isEmpty}
 			<TransformBox {scale} />
+		{/if}
+
+		{#if marquee}
+			<div
+				class="marquee"
+				style="--x: {marquee.x}px; --y: {marquee.y}px; --w: {marquee.w}px; --h: {marquee.h}px; --cs: {1 / scale};"
+				aria-hidden="true"
+			></div>
 		{/if}
 	</div>
 
@@ -227,6 +283,19 @@
 		font-family: var(--font-hand);
 		font-size: clamp(16px, 2vw, 22px);
 		color: var(--color-pink);
+	}
+
+	.marquee {
+		position: absolute;
+		left: 0;
+		top: 0;
+		width: var(--w);
+		height: var(--h);
+		transform: translate(var(--x), var(--y));
+		background: rgba(43, 79, 255, 0.08);
+		border: calc(2px * var(--cs)) dashed var(--color-cobalt);
+		pointer-events: none;
+		z-index: 60;
 	}
 
 	.hud {
