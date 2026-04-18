@@ -59,6 +59,18 @@
 		if (selection.has(id)) selection.remove(id);
 	}
 
+	function bumpUp(id: string, e: MouseEvent) {
+		history.commit();
+		if (e.shiftKey) scene.bringToFront(id);
+		else scene.bringForward(id);
+	}
+
+	function bumpDown(id: string, e: MouseEvent) {
+		history.commit();
+		if (e.shiftKey) scene.sendToBack(id);
+		else scene.sendBackward(id);
+	}
+
 	const reversed = $derived([...scene.layers].reverse());
 </script>
 
@@ -75,6 +87,22 @@
 						<span class="name" class:dim={l.hidden}>{layerLabel(l)}</span>
 					</button>
 					<div class="controls">
+						<button
+							class="icon-btn"
+							onclick={(e) => bumpUp(l.id, e)}
+							aria-label="Bring forward (shift: to front)"
+							title="Bring forward · shift: to front"
+						>
+							▲
+						</button>
+						<button
+							class="icon-btn"
+							onclick={(e) => bumpDown(l.id, e)}
+							aria-label="Send backward (shift: to back)"
+							title="Send backward · shift: to back"
+						>
+							▼
+						</button>
 						<button
 							class="icon-btn"
 							data-on={!l.hidden}
