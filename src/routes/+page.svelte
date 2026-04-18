@@ -3,6 +3,7 @@
 	import ModePicker from '$lib/components/ModePicker.svelte';
 	import Stage from '$lib/components/Stage.svelte';
 	import EditorCanvas from '$lib/components/EditorCanvas.svelte';
+	import ExportDialog from '$lib/components/ExportDialog.svelte';
 </script>
 
 <svelte:head>
@@ -22,3 +23,5 @@
 		{/snippet}
 	</Stage>
 {/if}
+
+<ExportDialog />

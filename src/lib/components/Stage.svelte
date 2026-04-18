@@ -1,5 +1,10 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
+	import { exporter } from '$lib/state/export.svelte';
+	import { scene } from '$lib/state/scene.svelte';
+	import { ui } from '$lib/state/ui.svelte';
+	import StickyButton from './StickyButton.svelte';
+	import Scribble from './Scribble.svelte';
 
 	interface Props {
 		toolbar?: Snippet;
@@ -8,16 +13,49 @@
 	}
 
 	let { toolbar, canvas, panels }: Props = $props();
+
+	function eject() {
+		scene.reset();
+		ui.modePicked = false;
+	}
 </script>
 
 <div class="stage">
 	<header class="header">
-		<div class="brand">
-			<span class="wordmark">stick</span>
-			<span class="tilde">·and·</span>
-			<span class="wordmark">slap</span>
+		<div class="brand-side">
+			<div class="brand">
+				<span class="wordmark">stick</span>
+				<span class="tilde">·and·</span>
+				<span class="wordmark">slap</span>
+			</div>
+			<span class="tagline">the canvas editor that slaps</span>
 		</div>
-		<span class="tagline">the canvas editor that slaps</span>
+
+		<div class="actions">
+			<span class="hint">
+				<kbd>T</kbd> text
+				<kbd>R</kbd> rect
+				<kbd>C</kbd> circle
+				<kbd>B</kbd> bubble
+				<kbd>X</kbd> star
+				<kbd>A</kbd> arrow
+				<kbd>⌫</kbd> delete
+			</span>
+			<StickyButton label="new canvas" color="paper" size="sm" onclick={eject} />
+			<StickyButton
+				color="yellow"
+				size="lg"
+				shadowColor="pink"
+				onclick={() => exporter.run()}
+			>
+				{#snippet children()}
+					<span class="export-label">
+						<Scribble kind="bang" size={18} color="var(--color-cobalt)" />
+						export
+					</span>
+				{/snippet}
+			</StickyButton>
+		</div>
 	</header>
 
 	<div class="workbench">
@@ -53,15 +91,59 @@
 
 	.header {
 		display: flex;
-		align-items: baseline;
+		align-items: center;
 		justify-content: space-between;
+		gap: 16px;
+		flex-wrap: wrap;
 		padding: 4px 8px;
+	}
+
+	.brand-side {
+		display: flex;
+		align-items: baseline;
+		gap: 12px;
 	}
 
 	.brand {
 		display: inline-flex;
 		align-items: baseline;
 		gap: 4px;
+	}
+
+	.actions {
+		display: flex;
+		align-items: center;
+		gap: 10px;
+		flex-wrap: wrap;
+	}
+
+	.hint {
+		display: inline-flex;
+		align-items: center;
+		gap: 6px;
+		font-family: var(--font-data);
+		font-size: 10px;
+		letter-spacing: 0.14em;
+		text-transform: uppercase;
+		color: var(--color-ink-soft);
+	}
+
+	.hint kbd {
+		display: inline-block;
+		padding: 2px 6px;
+		margin-right: 2px;
+		background: var(--color-paper);
+		border: 2px solid var(--color-ink);
+		border-radius: 4px;
+		font-family: var(--font-data);
+		font-size: 10px;
+		box-shadow: 1px 1px 0 var(--color-ink);
+	}
+
+	.export-label {
+		display: inline-flex;
+		align-items: center;
+		gap: 6px;
 	}
 
 	.wordmark {
