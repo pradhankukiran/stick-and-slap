@@ -28,11 +28,16 @@ export function snapshotScene(scene: {
 	};
 }
 
+function throwIfAborted(signal?: AbortSignal): void {
+	if (signal?.aborted) throw new DOMException('aborted', 'AbortError');
+}
+
 export async function renderSceneToCanvas(
 	scene: SceneSnapshot,
-	options: { scale?: number } = {}
+	options: { scale?: number; signal?: AbortSignal } = {}
 ): Promise<HTMLCanvasElement> {
-	const { scale = 1 } = options;
+	const { scale = 1, signal } = options;
+	throwIfAborted(signal);
 	const canvas = document.createElement('canvas');
 	canvas.width = Math.max(1, Math.round(scene.width * scale));
 	canvas.height = Math.max(1, Math.round(scene.height * scale));
@@ -44,8 +49,10 @@ export async function renderSceneToCanvas(
 	ctx.fillRect(0, 0, scene.width, scene.height);
 
 	await ensureFontsLoaded(scene.layers);
+	throwIfAborted(signal);
 
 	for (const layer of scene.layers) {
+		throwIfAborted(signal);
 		if (layer.hidden) continue;
 		ctx.save();
 		ctx.globalAlpha = layer.opacity;
@@ -55,11 +62,12 @@ export async function renderSceneToCanvas(
 		ctx.rotate(layer.rotation);
 		ctx.translate(-layer.w / 2, -layer.h / 2);
 
-		if (layer.type === 'image') await paintImage(ctx, layer as ImageLayer);
+		if (layer.type === 'image') await paintImage(ctx, layer as ImageLayer, signal);
 		else if (layer.type === 'text') paintText(ctx, layer as TextLayer);
 		else if (layer.type === 'shape') paintShape(ctx, layer as ShapeLayer);
 
 		ctx.restore();
+		throwIfAborted(signal);
 	}
 
 	return canvas;
@@ -67,11 +75,16 @@ export async function renderSceneToCanvas(
 
 export async function exportSceneAsPNG(
 	scene: SceneSnapshot,
-	options: { scale?: number } = {}
+	options: { scale?: number; signal?: AbortSignal } = {}
 ): Promise<Blob> {
 	const canvas = await renderSceneToCanvas(scene, options);
+	throwIfAborted(options.signal);
 	return new Promise<Blob>((resolve, reject) => {
 		canvas.toBlob((b) => {
+			if (options.signal?.aborted) {
+				reject(new DOMException('aborted', 'AbortError'));
+				return;
+			}
 			if (b) resolve(b);
 			else reject(new Error('canvas.toBlob returned null'));
 		}, 'image/png');
@@ -91,9 +104,14 @@ async function ensureFontsLoaded(layers: Layer[]): Promise<void> {
 	await Promise.allSettled(Array.from(needed).map((f) => document.fonts.load(f)));
 }
 
-async function paintImage(ctx: CanvasRenderingContext2D, layer: ImageLayer): Promise<void> {
+async function paintImage(
+	ctx: CanvasRenderingContext2D,
+	layer: ImageLayer,
+	signal?: AbortSignal
+): Promise<void> {
 	try {
 		const img = await loadImage(layer.src);
+		if (signal?.aborted) throw new DOMException('aborted', 'AbortError');
 		ctx.drawImage(img, 0, 0, layer.w, layer.h);
 		if (layer.filter === 'grayscale') {
 			const imgData = ctx.getImageData(0, 0, layer.w, layer.h);
@@ -105,6 +123,7 @@ async function paintImage(ctx: CanvasRenderingContext2D, layer: ImageLayer): Pro
 			ctx.putImageData(imgData, 0, 0);
 		}
 	} catch (err) {
+		if ((err as DOMException).name === 'AbortError') throw err;
 		console.warn('image paint failed', err);
 	}
 }

@@ -9,6 +9,11 @@
 		exporter.close();
 	}
 
+	function cancelRender() {
+		exporter.cancel();
+		exporter.close();
+	}
+
 	function onBackdropClick() {
 		if (exporter.status === 'rendering') return;
 		dismiss();
@@ -77,7 +82,7 @@
 						/>
 						<StickyButton label="close" color="paper" onclick={dismiss} />
 					{:else}
-						<StickyButton label="cancel" color="paper" onclick={dismiss} />
+						<StickyButton label="cancel" color="paper" onclick={cancelRender} />
 					{/if}
 				</footer>
 			</StickyPanel>
