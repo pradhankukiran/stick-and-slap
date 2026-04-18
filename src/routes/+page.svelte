@@ -4,6 +4,7 @@
 	import Stage from '$lib/components/Stage.svelte';
 	import EditorCanvas from '$lib/components/EditorCanvas.svelte';
 	import ExportDialog from '$lib/components/ExportDialog.svelte';
+	import Toolbar from '$lib/components/Toolbar.svelte';
 </script>
 
 <svelte:head>
@@ -18,6 +19,9 @@
 	<ModePicker />
 {:else}
 	<Stage>
+		{#snippet toolbar()}
+			<Toolbar />
+		{/snippet}
 		{#snippet canvas()}
 			<EditorCanvas />
 		{/snippet}
