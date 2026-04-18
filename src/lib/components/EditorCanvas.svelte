@@ -216,22 +216,23 @@
 	function onDocKey(e: KeyboardEvent) {
 		if (isTypingInEditable()) return;
 		const key = e.key.toLowerCase();
-		if (key === 't') {
+		const bareKey = !e.metaKey && !e.ctrlKey;
+		if (bareKey && key === 't') {
 			e.preventDefault();
 			addTextLayer();
-		} else if (key === 'r') {
+		} else if (bareKey && key === 'r') {
 			e.preventDefault();
 			addShapeLayer('rect');
-		} else if (key === 'c') {
+		} else if (bareKey && key === 'c') {
 			e.preventDefault();
 			addShapeLayer('circle');
-		} else if (key === 'b') {
+		} else if (bareKey && key === 'b') {
 			e.preventDefault();
 			addShapeLayer('speech');
-		} else if (key === 'x') {
+		} else if (bareKey && key === 'x') {
 			e.preventDefault();
 			addShapeLayer('star');
-		} else if (key === 'a') {
+		} else if (bareKey && key === 'a') {
 			e.preventDefault();
 			addShapeLayer('arrow');
 		} else if (key === 'delete' || key === 'backspace') {
