@@ -1,5 +1,7 @@
 export type Tool = 'select' | 'text' | 'rect' | 'circle' | 'speech' | 'star' | 'arrow' | 'sticker' | 'emoji';
 
+import type { SnapGuide } from '$lib/geom/snap';
+
 class UIState {
 	tool = $state<Tool>('select');
 	zoom = $state<number>(1);
@@ -8,6 +10,7 @@ class UIState {
 	pickerOpen = $state<'none' | 'sticker' | 'emoji' | 'font'>('none');
 	reducedMotion = $state<boolean>(false);
 	modePicked = $state<boolean>(false);
+	activeGuides = $state<SnapGuide[]>([]);
 
 	constructor() {
 		if (typeof window !== 'undefined') {

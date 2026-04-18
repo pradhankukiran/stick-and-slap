@@ -324,6 +324,18 @@
 			<TransformBox {scale} />
 		{/if}
 
+		{#if ui.activeGuides.length > 0}
+			<div class="guides" aria-hidden="true" style="--cs: {1 / scale}">
+				{#each ui.activeGuides as g, i (i)}
+					{#if g.orientation === 'v'}
+						<div class="guide v" style="--p: {g.position}px"></div>
+					{:else}
+						<div class="guide h" style="--p: {g.position}px"></div>
+					{/if}
+				{/each}
+			</div>
+		{/if}
+
 		{#if marquee}
 			<div
 				class="marquee"
@@ -454,6 +466,33 @@
 		border: calc(2px * var(--cs)) dashed var(--color-cobalt);
 		pointer-events: none;
 		z-index: 60;
+	}
+
+	.guides {
+		position: absolute;
+		inset: 0;
+		pointer-events: none;
+		z-index: 55;
+	}
+
+	.guide.v {
+		position: absolute;
+		top: 0;
+		bottom: 0;
+		left: var(--p);
+		width: calc(1.5px * var(--cs));
+		background: var(--color-pink);
+		box-shadow: 0 0 calc(4px * var(--cs)) rgba(255, 79, 163, 0.6);
+	}
+
+	.guide.h {
+		position: absolute;
+		left: 0;
+		right: 0;
+		top: var(--p);
+		height: calc(1.5px * var(--cs));
+		background: var(--color-pink);
+		box-shadow: 0 0 calc(4px * var(--cs)) rgba(255, 79, 163, 0.6);
 	}
 
 	.hud {

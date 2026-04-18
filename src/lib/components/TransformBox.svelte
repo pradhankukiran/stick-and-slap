@@ -2,9 +2,11 @@
 	import { scene, type Layer } from '$lib/state/scene.svelte';
 	import { selection } from '$lib/state/selection.svelte';
 	import { history } from '$lib/state/history.svelte';
+	import { ui } from '$lib/state/ui.svelte';
 	import { draggable, type DragInfo } from '$lib/actions/draggable';
 	import { applyHandleDrag, applyRotation, angleTo, type HandleName } from '$lib/geom/transform';
-	import { layerBBox, rotatedCorners } from '$lib/geom/bbox';
+	import { layerBBox, rotatedCorners, unionBBox } from '$lib/geom/bbox';
+	import { snapBBox } from '$lib/geom/snap';
 
 	interface Props {
 		scale: number;
@@ -65,6 +67,7 @@
 			},
 			onend: () => {
 				dragStart = null;
+				ui.activeGuides = [];
 			}
 		};
 	}
@@ -87,8 +90,32 @@
 				const rect = canvasEl.getBoundingClientRect();
 				const startLocal = screenToCanvas(dragStart.pointer.x, dragStart.pointer.y, rect);
 				const nowLocal = screenToCanvas(info.x, info.y, rect);
-				const dx = nowLocal.x - startLocal.x;
-				const dy = nowLocal.y - startLocal.y;
+				let dx = nowLocal.x - startLocal.x;
+				let dy = nowLocal.y - startLocal.y;
+
+				if (ui.snapEnabled && !info.altKey) {
+					const selectedIds = new Set(dragStart.layers.map((l) => l.snapshot.id));
+					const movingBBoxes = dragStart.layers.map((l) =>
+						layerBBox({ ...l.snapshot, x: l.snapshot.x + dx, y: l.snapshot.y + dy })
+					);
+					const groupBBox = unionBBox(movingBBoxes);
+					if (groupBBox) {
+						const others = scene.layers
+							.filter((l) => !selectedIds.has(l.id) && !l.hidden)
+							.map((l) => layerBBox(l));
+						const snap = snapBBox(groupBBox, {
+							canvasW: scene.width,
+							canvasH: scene.height,
+							otherBBoxes: others
+						});
+						dx += snap.dx;
+						dy += snap.dy;
+						ui.activeGuides = snap.guides;
+					} else {
+						ui.activeGuides = [];
+					}
+				}
+
 				for (const { snapshot } of dragStart.layers) {
 					scene.updateLayer(snapshot.id, {
 						x: snapshot.x + dx,
@@ -98,6 +125,7 @@
 			},
 			onend: () => {
 				dragStart = null;
+				ui.activeGuides = [];
 			}
 		};
 	}
@@ -136,6 +164,7 @@
 			},
 			onend: () => {
 				dragStart = null;
+				ui.activeGuides = [];
 			}
 		};
 	}
