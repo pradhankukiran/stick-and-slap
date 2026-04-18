@@ -40,6 +40,7 @@
 		history.commit();
 		scene.addLayer(layer);
 		selection.select(layer.id);
+		ui.autoEditId = layer.id;
 	}
 
 	function addShape(kind: ShapeKind) {

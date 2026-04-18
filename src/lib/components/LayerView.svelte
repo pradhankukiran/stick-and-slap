@@ -3,6 +3,7 @@
 	import { scene } from '$lib/state/scene.svelte';
 	import { selection } from '$lib/state/selection.svelte';
 	import { history } from '$lib/state/history.svelte';
+	import { ui } from '$lib/state/ui.svelte';
 	import { fontById } from '$lib/media/fonts';
 	import { shapePath } from '$lib/geom/shapes';
 
@@ -15,6 +16,28 @@
 	const selected = $derived(selection.has(layer.id));
 	let editing = $state(false);
 	let textRef: HTMLDivElement | undefined = $state();
+
+	function focusAndSelectAll() {
+		queueMicrotask(() => {
+			textRef?.focus();
+			const range = document.createRange();
+			if (textRef) {
+				range.selectNodeContents(textRef);
+				const sel = window.getSelection();
+				sel?.removeAllRanges();
+				sel?.addRange(range);
+			}
+		});
+	}
+
+	// Auto-enter edit mode when this layer was just spawned and requested focus.
+	$effect(() => {
+		if (layer.type === 'text' && ui.autoEditId === layer.id) {
+			ui.autoEditId = null;
+			editing = true;
+			focusAndSelectAll();
+		}
+	});
 
 	function onClick(e: MouseEvent) {
 		e.stopPropagation();
@@ -30,17 +53,7 @@
 		e.stopPropagation();
 		history.commit();
 		editing = true;
-		queueMicrotask(() => {
-			textRef?.focus();
-			// Select all text on entry
-			const range = document.createRange();
-			if (textRef) {
-				range.selectNodeContents(textRef);
-				const sel = window.getSelection();
-				sel?.removeAllRanges();
-				sel?.addRange(range);
-			}
-		});
+		focusAndSelectAll();
 	}
 
 	function onTextBlur() {

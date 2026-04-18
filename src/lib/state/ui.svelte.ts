@@ -11,6 +11,7 @@ class UIState {
 	reducedMotion = $state<boolean>(false);
 	modePicked = $state<boolean>(false);
 	activeGuides = $state<SnapGuide[]>([]);
+	autoEditId = $state<string | null>(null);
 
 	constructor() {
 		if (typeof window !== 'undefined') {
