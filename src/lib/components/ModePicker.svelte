@@ -206,9 +206,11 @@
 	}
 
 	.preview-inner {
-		width: 64%;
+		width: auto;
+		height: auto;
+		max-width: 80%;
+		max-height: 48px;
 		aspect-ratio: calc(var(--w) / var(--h));
-		max-height: 52px;
 		background: var(--color-paper);
 		border: 2px solid var(--color-ink);
 	}
