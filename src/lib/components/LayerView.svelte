@@ -1,8 +1,9 @@
 <script lang="ts">
-	import type { Layer, ImageLayer, TextLayer } from '$lib/state/scene.svelte';
+	import type { Layer, ImageLayer, TextLayer, ShapeLayer } from '$lib/state/scene.svelte';
 	import { scene } from '$lib/state/scene.svelte';
 	import { selection } from '$lib/state/selection.svelte';
 	import { fontById } from '$lib/media/fonts';
+	import { shapePath } from '$lib/geom/shapes';
 
 	interface Props {
 		layer: Layer;
@@ -125,7 +126,16 @@
 			style={textStyles}
 		>{t.text}</div>
 	{:else if layer.type === 'shape'}
-		<span class="placeholder">shape layer</span>
+		{@const s = layer as ShapeLayer}
+		<svg viewBox="0 0 {s.w} {s.h}" preserveAspectRatio="none" class="shape-svg">
+			<path
+				d={shapePath(s.shape, s.w, s.h, s.cornerRadius ?? 0)}
+				fill={s.fill}
+				stroke={s.strokeColor}
+				stroke-width={s.strokeWidth}
+				stroke-linejoin="round"
+			/>
+		</svg>
 	{:else if layer.type === 'sticker'}
 		<span class="placeholder">sticker layer</span>
 	{/if}
@@ -178,6 +188,13 @@
 
 	.layer[data-editing='true'] {
 		cursor: text;
+	}
+
+	.shape-svg {
+		width: 100%;
+		height: 100%;
+		overflow: visible;
+		pointer-events: none;
 	}
 
 	.placeholder {

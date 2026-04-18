@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { scene, makeId, type ImageLayer, type TextLayer } from '$lib/state/scene.svelte';
+	import { scene, makeId, type ImageLayer, type TextLayer, type ShapeLayer, type ShapeKind } from '$lib/state/scene.svelte';
 	import { selection } from '$lib/state/selection.svelte';
 	import { ui } from '$lib/state/ui.svelte';
 	import LayerView from './LayerView.svelte';
@@ -138,6 +138,38 @@
 		window.removeEventListener('pointerup', onMarqueeUp);
 	}
 
+	export function addShapeLayer(kind: ShapeKind) {
+		const w = kind === 'circle' || kind === 'star' ? 320 : 360;
+		const h = kind === 'arrow' ? 120 : 240;
+		const fills: Record<ShapeKind, string> = {
+			rect: '#FF4FA3',
+			circle: '#FAFF00',
+			speech: '#FDFCF7',
+			star: '#FAFF00',
+			arrow: '#2B4FFF'
+		};
+		const layer: ShapeLayer = {
+			id: makeId('S'),
+			type: 'shape',
+			shape: kind,
+			fill: fills[kind],
+			strokeColor: '#0A0A0A',
+			strokeWidth: 6,
+			cornerRadius: kind === 'rect' ? 14 : 0,
+			x: (scene.width - w) / 2,
+			y: (scene.height - h) / 2,
+			w,
+			h,
+			rotation: 0,
+			opacity: 1,
+			locked: false,
+			hidden: false
+		};
+		scene.addLayer(layer);
+		selection.select(layer.id);
+		return layer;
+	}
+
 	export function addTextLayer(text = 'SLAP') {
 		const w = 400;
 		const h = 140;
@@ -183,6 +215,21 @@
 		if (key === 't') {
 			e.preventDefault();
 			addTextLayer();
+		} else if (key === 'r') {
+			e.preventDefault();
+			addShapeLayer('rect');
+		} else if (key === 'c') {
+			e.preventDefault();
+			addShapeLayer('circle');
+		} else if (key === 'b') {
+			e.preventDefault();
+			addShapeLayer('speech');
+		} else if (key === 'x') {
+			e.preventDefault();
+			addShapeLayer('star');
+		} else if (key === 'a') {
+			e.preventDefault();
+			addShapeLayer('arrow');
 		} else if (key === 'delete' || key === 'backspace') {
 			if (selection.ids.length > 0) {
 				e.preventDefault();
