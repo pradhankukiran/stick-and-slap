@@ -2,6 +2,7 @@
 	import type { Layer, ImageLayer, TextLayer, ShapeLayer } from '$lib/state/scene.svelte';
 	import { scene } from '$lib/state/scene.svelte';
 	import { selection } from '$lib/state/selection.svelte';
+	import { history } from '$lib/state/history.svelte';
 	import { fontById } from '$lib/media/fonts';
 	import { shapePath } from '$lib/geom/shapes';
 
@@ -27,6 +28,7 @@
 	function onDblClick(e: MouseEvent) {
 		if (layer.type !== 'text') return;
 		e.stopPropagation();
+		history.commit();
 		editing = true;
 		queueMicrotask(() => {
 			textRef?.focus();

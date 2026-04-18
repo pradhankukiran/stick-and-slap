@@ -2,6 +2,7 @@
 	import { scene, makeId, type ImageLayer, type TextLayer, type ShapeLayer, type ShapeKind } from '$lib/state/scene.svelte';
 	import { selection } from '$lib/state/selection.svelte';
 	import { ui } from '$lib/state/ui.svelte';
+	import { history } from '$lib/state/history.svelte';
 	import LayerView from './LayerView.svelte';
 	import TransformBox from './TransformBox.svelte';
 	import { layerBBox, bboxIntersects } from '$lib/geom/bbox';
@@ -59,6 +60,7 @@
 			locked: false,
 			hidden: false
 		};
+		history.commit();
 		scene.addLayer(layer);
 		selection.select(layer.id);
 	}
@@ -165,6 +167,7 @@
 			locked: false,
 			hidden: false
 		};
+		history.commit();
 		scene.addLayer(layer);
 		selection.select(layer.id);
 		return layer;
@@ -192,6 +195,7 @@
 			locked: false,
 			hidden: false
 		};
+		history.commit();
 		scene.addLayer(layer);
 		selection.select(layer.id);
 		return layer;
@@ -233,6 +237,7 @@
 		} else if (key === 'delete' || key === 'backspace') {
 			if (selection.ids.length > 0) {
 				e.preventDefault();
+				history.commit();
 				for (const id of [...selection.ids]) scene.removeLayer(id);
 				selection.clear();
 			}
@@ -241,10 +246,51 @@
 		} else if (key === 'arrowleft' || key === 'arrowright' || key === 'arrowup' || key === 'arrowdown') {
 			if (selection.ids.length === 0) return;
 			e.preventDefault();
+			if (!e.repeat) history.commit();
 			const step = e.shiftKey ? 10 : 1;
 			const dx = key === 'arrowleft' ? -step : key === 'arrowright' ? step : 0;
 			const dy = key === 'arrowup' ? -step : key === 'arrowdown' ? step : 0;
 			for (const id of selection.ids) scene.moveLayer(id, { dx, dy });
+		} else if ((e.metaKey || e.ctrlKey) && key === 'z') {
+			e.preventDefault();
+			if (e.shiftKey) history.redo();
+			else history.undo();
+		} else if ((e.metaKey || e.ctrlKey) && key === 'y') {
+			e.preventDefault();
+			history.redo();
+		} else if ((e.metaKey || e.ctrlKey) && key === 'd') {
+			e.preventDefault();
+			if (selection.ids.length === 0) return;
+			history.commit();
+			const newIds: string[] = [];
+			for (const id of selection.ids) {
+				const copy = scene.duplicate(id);
+				if (copy) newIds.push(copy.id);
+			}
+			if (newIds.length) selection.setMany(newIds);
+		} else if ((e.metaKey || e.ctrlKey) && key === 'a') {
+			e.preventDefault();
+			selection.selectAll();
+		} else if (key === ']' && e.shiftKey) {
+			e.preventDefault();
+			if (selection.ids.length === 0) return;
+			history.commit();
+			for (const id of selection.ids) scene.bringToFront(id);
+		} else if (key === '[' && e.shiftKey) {
+			e.preventDefault();
+			if (selection.ids.length === 0) return;
+			history.commit();
+			for (const id of selection.ids) scene.sendToBack(id);
+		} else if (key === ']') {
+			e.preventDefault();
+			if (selection.ids.length === 0) return;
+			history.commit();
+			for (const id of selection.ids) scene.bringForward(id);
+		} else if (key === '[') {
+			e.preventDefault();
+			if (selection.ids.length === 0) return;
+			history.commit();
+			for (const id of selection.ids) scene.sendBackward(id);
 		}
 	}
 </script>

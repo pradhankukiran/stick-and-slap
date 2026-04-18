@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { scene, type Layer } from '$lib/state/scene.svelte';
 	import { selection } from '$lib/state/selection.svelte';
+	import { history } from '$lib/state/history.svelte';
 	import { draggable, type DragInfo } from '$lib/actions/draggable';
 	import { applyHandleDrag, applyRotation, angleTo, type HandleName } from '$lib/geom/transform';
 	import { layerBBox, rotatedCorners } from '$lib/geom/bbox';
@@ -38,6 +39,7 @@
 			onstart: (info: DragInfo) => {
 				const layer = single;
 				if (!layer) return;
+				history.commit();
 				dragStart = {
 					layers: [{ layer, snapshot: { ...layer } }],
 					pointer: { x: info.x, y: info.y },
@@ -70,6 +72,7 @@
 	function moveHandlers() {
 		return {
 			onstart: (info: DragInfo) => {
+				history.commit();
 				const layers = selection.layers.map((l) => ({ layer: l, snapshot: { ...l } }));
 				dragStart = {
 					layers,
@@ -106,6 +109,7 @@
 				if (!layer) return;
 				const canvasEl = document.querySelector('.canvas') as HTMLElement | null;
 				if (!canvasEl) return;
+				history.commit();
 				const rect = canvasEl.getBoundingClientRect();
 				const pointer = screenToCanvas(info.x, info.y, rect);
 				const centerX = layer.x + layer.w / 2;
