@@ -272,22 +272,22 @@
 		} else if ((e.metaKey || e.ctrlKey) && key === 'a') {
 			e.preventDefault();
 			selection.selectAll();
-		} else if (key === ']' && e.shiftKey) {
+		} else if (e.code === 'BracketRight' && e.shiftKey) {
 			e.preventDefault();
 			if (selection.ids.length === 0) return;
 			history.commit();
 			for (const id of selection.ids) scene.bringToFront(id);
-		} else if (key === '[' && e.shiftKey) {
+		} else if (e.code === 'BracketLeft' && e.shiftKey) {
 			e.preventDefault();
 			if (selection.ids.length === 0) return;
 			history.commit();
 			for (const id of selection.ids) scene.sendToBack(id);
-		} else if (key === ']') {
+		} else if (e.code === 'BracketRight') {
 			e.preventDefault();
 			if (selection.ids.length === 0) return;
 			history.commit();
 			for (const id of selection.ids) scene.bringForward(id);
-		} else if (key === '[') {
+		} else if (e.code === 'BracketLeft') {
 			e.preventDefault();
 			if (selection.ids.length === 0) return;
 			history.commit();
