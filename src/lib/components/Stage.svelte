@@ -21,6 +21,16 @@
 </script>
 
 <div class="stage">
+	<div class="decor decor-1" aria-hidden="true">
+		<Scribble kind="star" size={26} color="var(--color-yellow)" rotate={-14} />
+	</div>
+	<div class="decor decor-2" aria-hidden="true">
+		<Scribble kind="sparkle" size={30} color="var(--color-pink)" rotate={18} />
+	</div>
+	<div class="decor decor-3" aria-hidden="true">
+		<Scribble kind="squiggle" size={60} color="var(--color-cobalt)" rotate={-4} />
+	</div>
+
 	<header class="header">
 		<div class="brand-side">
 			<div class="brand">
@@ -81,12 +91,53 @@
 
 <style>
 	.stage {
+		position: relative;
 		min-height: 100dvh;
 		display: flex;
 		flex-direction: column;
 		gap: 16px;
 		padding: 16px;
 		background: var(--color-paper);
+		overflow: hidden;
+	}
+
+	.decor {
+		position: absolute;
+		pointer-events: none;
+		opacity: 0.8;
+	}
+
+	.decor-1 {
+		top: 18px;
+		right: 30%;
+		animation: drift 6s ease-in-out infinite alternate;
+	}
+
+	.decor-2 {
+		bottom: 60px;
+		left: 20%;
+		animation: drift 7.2s ease-in-out infinite alternate-reverse;
+	}
+
+	.decor-3 {
+		top: 66px;
+		left: 38%;
+		opacity: 0.45;
+	}
+
+	@keyframes drift {
+		0% {
+			transform: translate(0, 0) rotate(0deg);
+		}
+		100% {
+			transform: translate(8px, -6px) rotate(8deg);
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.decor {
+			animation: none !important;
+		}
 	}
 
 	.header {
