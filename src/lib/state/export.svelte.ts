@@ -61,7 +61,7 @@ class ExportState {
 		if (!this.blob || !this.previewUrl) return;
 		const a = document.createElement('a');
 		a.href = this.previewUrl;
-		a.download = `slap_${Date.now()}.png`;
+		a.download = `slap_${scene.presetId}_${new Date().toISOString().slice(0, 10)}.png`;
 		a.click();
 	}
 }
