@@ -113,7 +113,13 @@
 
 	function onFileChange(e: Event) {
 		const f = (e.target as HTMLInputElement).files?.[0];
-		if (f) addImageFromFile(f);
+		if (f) {
+			if (!f.type.startsWith('image/')) {
+				alert('Please select an image file');
+			} else {
+				addImageFromFile(f);
+			}
+		}
 		(e.target as HTMLInputElement).value = '';
 	}
 </script>
