@@ -73,6 +73,12 @@ export function makeId(prefix = 'L'): string {
 	return `${prefix}${++idCounter}_${Math.random().toString(36).slice(2, 7)}`;
 }
 
+function revokeImageURL(layer: Layer) {
+	if (layer.type === 'image' && typeof layer.src === 'string' && layer.src.startsWith('blob:')) {
+		URL.revokeObjectURL(layer.src);
+	}
+}
+
 function clamp(v: number, lo: number, hi: number) {
 	return Math.max(lo, Math.min(v, hi));
 }
@@ -95,7 +101,12 @@ class SceneState {
 	}
 
 	reset() {
+		this.disposeAll();
 		this.layers = [];
+	}
+
+	disposeAll() {
+		for (const l of this.layers) revokeImageURL(l);
 	}
 
 	addLayer<L extends Layer>(layer: L): L {
