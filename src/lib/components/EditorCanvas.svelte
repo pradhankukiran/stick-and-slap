@@ -94,6 +94,13 @@
 		if (e.target === canvasEl) selection.clear();
 	}
 
+	function onWheel(e: WheelEvent) {
+		if (!(e.ctrlKey || e.metaKey)) return;
+		e.preventDefault();
+		const factor = e.deltaY > 0 ? 0.9 : 1.1;
+		ui.setZoom(ui.zoom * factor);
+	}
+
 	// Marquee selection
 	let marquee = $state<{ x: number; y: number; w: number; h: number } | null>(null);
 	let marqueeStart: { x: number; y: number } | null = null;
@@ -244,6 +251,15 @@
 			}
 		} else if (key === 'escape') {
 			selection.clear();
+		} else if (bareKey && (key === '+' || key === '=')) {
+			e.preventDefault();
+			ui.setZoom(ui.zoom * 1.1);
+		} else if (bareKey && key === '-') {
+			e.preventDefault();
+			ui.setZoom(ui.zoom * 0.9);
+		} else if (bareKey && key === '0') {
+			e.preventDefault();
+			ui.setZoom(1);
 		} else if (key === 'arrowleft' || key === 'arrowright' || key === 'arrowup' || key === 'arrowdown') {
 			if (selection.ids.length === 0) return;
 			e.preventDefault();
@@ -304,6 +320,7 @@
 	ondrop={onDrop}
 	ondragover={onDragOver}
 	ondragleave={onDragLeave}
+	onwheel={onWheel}
 	data-dragging={dragging}
 	role="application"
 >
