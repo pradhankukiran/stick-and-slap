@@ -141,6 +141,7 @@
 				stroke={s.strokeColor}
 				stroke-width={s.strokeWidth}
 				stroke-linejoin="round"
+				vector-effect="non-scaling-stroke"
 			/>
 		</svg>
 	{:else if layer.type === 'sticker'}
