@@ -23,23 +23,52 @@
 
 	let { value = $bindable(), onchange, palette = PALETTE, allowCustom = true }: Props = $props();
 
+	let groupEl: HTMLDivElement | undefined = $state();
+
 	function pick(c: string) {
 		value = c;
 		onchange?.(c);
 	}
+
+	function selectedIndex(): number {
+		const lower = value?.toLowerCase() ?? '';
+		const i = palette.findIndex((c) => c.toLowerCase() === lower);
+		return i >= 0 ? i : 0;
+	}
+
+	function focusSwatch(i: number) {
+		const btns = groupEl?.querySelectorAll<HTMLButtonElement>('button.swatch');
+		if (!btns) return;
+		const clamped = ((i % btns.length) + btns.length) % btns.length;
+		btns[clamped]?.focus();
+	}
+
+	function onKey(e: KeyboardEvent) {
+		if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+		e.preventDefault();
+		const current = selectedIndex();
+		const next = e.key === 'ArrowRight' ? current + 1 : current - 1;
+		const wrapped = ((next % palette.length) + palette.length) % palette.length;
+		pick(palette[wrapped]);
+		focusSwatch(wrapped);
+	}
 </script>
 
-<div class="swatches" role="radiogroup" aria-label="Color">
-	{#each palette as c (c)}
+<div class="swatches" role="radiogroup" aria-label="Color" bind:this={groupEl}>
+	{#each palette as c, i (c)}
+		{@const isSelected = value?.toLowerCase() === c.toLowerCase()}
+		{@const selIdx = selectedIndex()}
 		<button
 			type="button"
 			class="swatch"
 			style="--c: {c}"
-			data-selected={value?.toLowerCase() === c.toLowerCase()}
+			data-selected={isSelected}
 			role="radio"
-			aria-checked={value?.toLowerCase() === c.toLowerCase()}
+			aria-checked={isSelected}
 			aria-label={c}
+			tabindex={i === selIdx ? 0 : -1}
 			onclick={() => pick(c)}
+			onkeydown={onKey}
 		></button>
 	{/each}
 	{#if allowCustom}

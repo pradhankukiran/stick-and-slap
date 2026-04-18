@@ -5,8 +5,38 @@
 	import { history } from '$lib/state/history.svelte';
 	import LayerView from './LayerView.svelte';
 	import TransformBox from './TransformBox.svelte';
-	import { layerBBox, bboxIntersects } from '$lib/geom/bbox';
+	import { rotatedCorners, pointInBBox, type BBox, type Point } from '$lib/geom/bbox';
 	import { onMount } from 'svelte';
+
+	function pointInPolygon(p: Point, poly: Point[]): boolean {
+		let inside = false;
+		for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) {
+			const xi = poly[i].x;
+			const yi = poly[i].y;
+			const xj = poly[j].x;
+			const yj = poly[j].y;
+			const intersect =
+				yi > p.y !== yj > p.y && p.x < ((xj - xi) * (p.y - yi)) / (yj - yi) + xi;
+			if (intersect) inside = !inside;
+		}
+		return inside;
+	}
+
+	function polyIntersectsRect(poly: Point[], rect: BBox): boolean {
+		for (const pt of poly) {
+			if (pointInBBox(pt, rect)) return true;
+		}
+		const rectCorners: Point[] = [
+			{ x: rect.x, y: rect.y },
+			{ x: rect.x + rect.w, y: rect.y },
+			{ x: rect.x + rect.w, y: rect.y + rect.h },
+			{ x: rect.x, y: rect.y + rect.h }
+		];
+		for (const rc of rectCorners) {
+			if (pointInPolygon(rc, poly)) return true;
+		}
+		return false;
+	}
 
 	let stageEl: HTMLDivElement;
 	let canvasEl: HTMLDivElement;
@@ -123,18 +153,23 @@
 		if (!marqueeStart || !canvasEl) return;
 		const rect = canvasEl.getBoundingClientRect();
 		const now = { x: (e.clientX - rect.left) / scale, y: (e.clientY - rect.top) / scale };
+		const minX = Math.max(0, Math.min(marqueeStart.x, now.x));
+		const minY = Math.max(0, Math.min(marqueeStart.y, now.y));
+		const maxX = Math.min(scene.width, Math.max(marqueeStart.x, now.x));
+		const maxY = Math.min(scene.height, Math.max(marqueeStart.y, now.y));
 		marquee = {
-			x: Math.min(marqueeStart.x, now.x),
-			y: Math.min(marqueeStart.y, now.y),
-			w: Math.abs(now.x - marqueeStart.x),
-			h: Math.abs(now.y - marqueeStart.y)
+			x: minX,
+			y: minY,
+			w: Math.max(0, maxX - minX),
+			h: Math.max(0, maxY - minY)
 		};
 	}
 
 	function onMarqueeUp() {
 		if (marquee && marquee.w > 2 && marquee.h > 2) {
+			const rect = marquee;
 			const hits = scene.layers
-				.filter((l) => !l.hidden && !l.locked && bboxIntersects(marquee!, layerBBox(l)))
+				.filter((l) => !l.hidden && !l.locked && polyIntersectsRect(rotatedCorners(l), rect))
 				.map((l) => l.id);
 			if (marqueeAdd) selection.addRange(hits);
 			else selection.setMany(hits);
