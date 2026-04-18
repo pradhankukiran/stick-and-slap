@@ -69,24 +69,6 @@ export function applyHandleDrag(
 	if (Math.abs(newW) < minSize) newW = newW < 0 ? -minSize : minSize;
 	if (Math.abs(newH) < minSize) newH = newH < 0 ? -minSize : minSize;
 
-	// Uniform scaling (Shift): constrain to original aspect ratio
-	if (uniform && (handle === 'nw' || handle === 'ne' || handle === 'sw' || handle === 'se')) {
-		const aspect = initial.w / initial.h;
-		const currentAspect = Math.abs(newW / newH);
-		if (currentAspect > aspect) {
-			// too wide, match width to height
-			const signW = Math.sign(newW);
-			newW = signW * Math.abs(newH) * aspect;
-			if (handle === 'nw' || handle === 'sw') left = right - newW;
-			else right = left + newW;
-		} else {
-			const signH = Math.sign(newH);
-			newH = signH * Math.abs(newW) / aspect;
-			if (handle === 'nw' || handle === 'ne') top = bottom - newH;
-			else bottom = top + newH;
-		}
-	}
-
 	// Center-anchored scaling (Alt/Option): mirror the active edge around
 	// the rect center so the opposite edge moves the same distance.
 	if (fromCenter) {
@@ -110,6 +92,41 @@ export function applyHandleDrag(
 		newH = bottom - top;
 		if (Math.abs(newW) < minSize) newW = newW < 0 ? -minSize : minSize;
 		if (Math.abs(newH) < minSize) newH = newH < 0 ? -minSize : minSize;
+	}
+
+	// Uniform scaling (Shift): match the less-dragged axis to the dominant axis,
+	// so dragging a corner outward grows both dimensions together.
+	if (uniform && (handle === 'nw' || handle === 'ne' || handle === 'sw' || handle === 'se')) {
+		const aspect = initial.w / initial.h;
+		const wDelta = Math.abs(newW) - initial.w;
+		const hDelta = Math.abs(newH) - initial.h;
+		if (Math.abs(wDelta) >= Math.abs(hDelta)) {
+			// Width dominant — derive height from width
+			const signH = Math.sign(newH) || 1;
+			newH = (signH * Math.abs(newW)) / aspect;
+			if (fromCenter) {
+				const halfNewH = newH / 2;
+				top = -halfNewH;
+				bottom = halfNewH;
+			} else if (handle === 'nw' || handle === 'ne') {
+				top = bottom - newH;
+			} else {
+				bottom = top + newH;
+			}
+		} else {
+			// Height dominant — derive width from height
+			const signW = Math.sign(newW) || 1;
+			newW = signW * Math.abs(newH) * aspect;
+			if (fromCenter) {
+				const halfNewW = newW / 2;
+				left = -halfNewW;
+				right = halfNewW;
+			} else if (handle === 'nw' || handle === 'sw') {
+				left = right - newW;
+			} else {
+				right = left + newW;
+			}
+		}
 	}
 
 	// New center in local coords is midpoint of new box
