@@ -2,6 +2,7 @@
 	import { ui } from '$lib/state/ui.svelte';
 	import ModePicker from '$lib/components/ModePicker.svelte';
 	import Stage from '$lib/components/Stage.svelte';
+	import EditorCanvas from '$lib/components/EditorCanvas.svelte';
 </script>
 
 <svelte:head>
@@ -15,5 +16,9 @@
 {#if !ui.modePicked}
 	<ModePicker />
 {:else}
-	<Stage />
+	<Stage>
+		{#snippet canvas()}
+			<EditorCanvas />
+		{/snippet}
+	</Stage>
 {/if}

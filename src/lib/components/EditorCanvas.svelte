@@ -1,0 +1,251 @@
+<script lang="ts">
+	import { scene, makeId, type ImageLayer } from '$lib/state/scene.svelte';
+	import { selection } from '$lib/state/selection.svelte';
+	import { ui } from '$lib/state/ui.svelte';
+	import LayerView from './LayerView.svelte';
+	import { onMount } from 'svelte';
+
+	let stageEl: HTMLDivElement;
+	let canvasEl: HTMLDivElement;
+	let dragging = $state(false);
+	let containerWidth = $state(0);
+	let containerHeight = $state(0);
+
+	const fitScale = $derived.by(() => {
+		if (containerWidth === 0 || containerHeight === 0) return 1;
+		const sx = (containerWidth - 80) / scene.width;
+		const sy = (containerHeight - 80) / scene.height;
+		return Math.min(sx, sy, 1);
+	});
+
+	const scale = $derived(ui.zoom * fitScale);
+
+	onMount(() => {
+		const ro = new ResizeObserver((entries) => {
+			const rect = entries[0].contentRect;
+			containerWidth = rect.width;
+			containerHeight = rect.height;
+		});
+		ro.observe(stageEl);
+		return () => ro.disconnect();
+	});
+
+	async function acceptFile(file: File | null | undefined) {
+		if (!file) return;
+		if (!file.type.startsWith('image/')) return;
+		const url = URL.createObjectURL(file);
+		const dims = await loadImageDims(url);
+		const aspect = dims.w / dims.h;
+		const maxW = scene.width * 0.7;
+		const maxH = scene.height * 0.7;
+		let w = maxW;
+		let h = w / aspect;
+		if (h > maxH) {
+			h = maxH;
+			w = h * aspect;
+		}
+		const layer: ImageLayer = {
+			id: makeId('I'),
+			type: 'image',
+			src: url,
+			x: (scene.width - w) / 2,
+			y: (scene.height - h) / 2,
+			w,
+			h,
+			rotation: 0,
+			opacity: 1,
+			locked: false,
+			hidden: false
+		};
+		scene.addLayer(layer);
+		selection.select(layer.id);
+	}
+
+	function loadImageDims(url: string): Promise<{ w: number; h: number }> {
+		return new Promise((resolve) => {
+			const img = new Image();
+			img.onload = () => resolve({ w: img.naturalWidth, h: img.naturalHeight });
+			img.onerror = () => resolve({ w: 800, h: 800 });
+			img.src = url;
+		});
+	}
+
+	function onDragOver(e: DragEvent) {
+		e.preventDefault();
+		dragging = true;
+	}
+
+	function onDragLeave() {
+		dragging = false;
+	}
+
+	function onDrop(e: DragEvent) {
+		e.preventDefault();
+		dragging = false;
+		const file = e.dataTransfer?.files?.[0];
+		acceptFile(file);
+	}
+
+	function onBackgroundClick(e: MouseEvent) {
+		if (e.target === canvasEl) selection.clear();
+	}
+</script>
+
+<div
+	class="stage-wrap"
+	bind:this={stageEl}
+	ondrop={onDrop}
+	ondragover={onDragOver}
+	ondragleave={onDragLeave}
+	data-dragging={dragging}
+	role="application"
+>
+	<div
+		class="canvas"
+		bind:this={canvasEl}
+		style="--w: {scene.width}px; --h: {scene.height}px; --scale: {scale}; --bg: {scene.background}"
+		onclick={onBackgroundClick}
+		role="presentation"
+	>
+		{#each scene.layers as layer (layer.id)}
+			{#if !layer.hidden}
+				<LayerView {layer} />
+			{/if}
+		{/each}
+	</div>
+
+	{#if dragging}
+		<div class="drop-overlay">
+			<div class="drop-msg">
+				<span class="drop-title">drop to slap</span>
+				<span class="drop-sub">we'll put it on the canvas</span>
+			</div>
+		</div>
+	{/if}
+
+	{#if scene.layers.length === 0 && !dragging}
+		<div class="empty" aria-hidden="true">
+			<span class="empty-title">drop a pic</span>
+			<span class="empty-sub">or press T to type, R for rect, S for sticker</span>
+		</div>
+	{/if}
+
+	<div class="hud" aria-hidden="true">
+		<span>{scene.width} × {scene.height}</span>
+		<span class="dot"></span>
+		<span>{Math.round(scale * 100)}%</span>
+	</div>
+</div>
+
+<style>
+	.stage-wrap {
+		position: relative;
+		width: 100%;
+		height: 100%;
+		min-height: 520px;
+		display: grid;
+		place-items: center;
+		overflow: hidden;
+	}
+
+	.canvas {
+		position: relative;
+		width: var(--w);
+		height: var(--h);
+		background: var(--bg);
+		border: 3px solid var(--color-ink);
+		border-radius: 4px;
+		box-shadow: 6px 6px 0 var(--color-ink);
+		transform: scale(var(--scale));
+		transform-origin: center center;
+		user-select: none;
+	}
+
+	[data-dragging='true'] .canvas {
+		box-shadow: 0 0 0 4px var(--color-cobalt), 6px 6px 0 var(--color-ink);
+	}
+
+	.drop-overlay {
+		position: absolute;
+		inset: 0;
+		display: grid;
+		place-items: center;
+		pointer-events: none;
+		background: repeating-linear-gradient(
+			45deg,
+			rgba(43, 79, 255, 0.05) 0 20px,
+			rgba(43, 79, 255, 0.12) 20px 40px
+		);
+	}
+
+	.drop-msg {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 4px;
+		padding: 20px 32px;
+		background: var(--color-yellow);
+		border: 3px solid var(--color-ink);
+		box-shadow: 4px 4px 0 var(--color-ink);
+		transform: rotate(-2deg);
+	}
+
+	.drop-title {
+		font-family: var(--font-display);
+		font-size: 28px;
+	}
+
+	.drop-sub {
+		font-family: var(--font-hand);
+		font-size: 18px;
+	}
+
+	.empty {
+		position: absolute;
+		inset: 0;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		gap: 4px;
+		pointer-events: none;
+	}
+
+	.empty-title {
+		font-family: var(--font-display);
+		font-size: clamp(32px, 6vw, 56px);
+		color: var(--color-ink-soft);
+		transform: rotate(-2deg);
+	}
+
+	.empty-sub {
+		font-family: var(--font-hand);
+		font-size: clamp(16px, 2vw, 22px);
+		color: var(--color-pink);
+	}
+
+	.hud {
+		position: absolute;
+		bottom: 10px;
+		right: 12px;
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		padding: 4px 10px;
+		background: var(--color-ink);
+		color: var(--color-paper);
+		font-family: var(--font-data);
+		font-size: 10px;
+		letter-spacing: 0.16em;
+		text-transform: uppercase;
+		border-radius: 999px;
+		pointer-events: none;
+	}
+
+	.dot {
+		width: 4px;
+		height: 4px;
+		border-radius: 50%;
+		background: var(--color-pink);
+	}
+</style>
