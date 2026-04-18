@@ -5,6 +5,9 @@
 	import StickyPanel from './StickyPanel.svelte';
 	import Scribble from './Scribble.svelte';
 
+	let panelEl: HTMLDivElement | null = $state(null);
+	let priorFocus: HTMLElement | null = null;
+
 	function dismiss() {
 		exporter.close();
 	}
@@ -18,6 +21,21 @@
 		if (exporter.status === 'rendering') return;
 		dismiss();
 	}
+
+	$effect(() => {
+		if (exporter.open) {
+			priorFocus = document.activeElement as HTMLElement | null;
+			queueMicrotask(() => {
+				const target = panelEl?.querySelector<HTMLButtonElement>(
+					'button:not(:disabled)'
+				);
+				target?.focus();
+			});
+		} else if (priorFocus) {
+			priorFocus.focus?.();
+			priorFocus = null;
+		}
+	});
 </script>
 
 {#if exporter.open}
@@ -29,6 +47,7 @@
 	>
 		<div
 			class="panel-wrap"
+			bind:this={panelEl}
 			transition:scale={{ duration: 220, start: 0.92 }}
 			onclick={(e) => e.stopPropagation()}
 			onkeydown={(e) => e.stopPropagation()}
