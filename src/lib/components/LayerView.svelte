@@ -46,6 +46,11 @@
 	function onTextBlur() {
 		editing = false;
 		if (layer.type === 'text' && textRef) {
+			if (textRef.innerText.trim() === '') {
+				scene.removeLayer(layer.id);
+				selection.clear();
+				return;
+			}
 			scene.updateLayer(layer.id, { text: textRef.innerText });
 		}
 	}
