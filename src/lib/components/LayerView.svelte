@@ -62,10 +62,7 @@
 		cursor: pointer;
 	}
 
-	.layer[data-selected='true'] {
-		outline: 2px dashed var(--color-cobalt);
-		outline-offset: 2px;
-	}
+	/* selection outline drawn by TransformBox */
 
 	img {
 		width: 100%;

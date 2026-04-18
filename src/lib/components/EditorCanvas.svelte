@@ -3,6 +3,7 @@
 	import { selection } from '$lib/state/selection.svelte';
 	import { ui } from '$lib/state/ui.svelte';
 	import LayerView from './LayerView.svelte';
+	import TransformBox from './TransformBox.svelte';
 	import { onMount } from 'svelte';
 
 	let stageEl: HTMLDivElement;
@@ -112,6 +113,10 @@
 				<LayerView {layer} />
 			{/if}
 		{/each}
+
+		{#if !selection.isEmpty}
+			<TransformBox {scale} />
+		{/if}
 	</div>
 
 	{#if dragging}
