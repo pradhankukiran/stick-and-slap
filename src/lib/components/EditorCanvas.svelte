@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { scene, makeId, type ImageLayer } from '$lib/state/scene.svelte';
+	import { scene, makeId, type ImageLayer, type TextLayer } from '$lib/state/scene.svelte';
 	import { selection } from '$lib/state/selection.svelte';
 	import { ui } from '$lib/state/ui.svelte';
 	import LayerView from './LayerView.svelte';
@@ -137,7 +137,72 @@
 		window.removeEventListener('pointermove', onMarqueeMove);
 		window.removeEventListener('pointerup', onMarqueeUp);
 	}
+
+	export function addTextLayer(text = 'SLAP') {
+		const w = 400;
+		const h = 140;
+		const layer: TextLayer = {
+			id: makeId('T'),
+			type: 'text',
+			text,
+			font: 'display',
+			weight: 400,
+			size: 96,
+			color: '#0A0A0A',
+			align: 'center',
+			stroke: { color: '#FAFF00', width: 6 },
+			x: (scene.width - w) / 2,
+			y: (scene.height - h) / 2,
+			w,
+			h,
+			rotation: 0,
+			opacity: 1,
+			locked: false,
+			hidden: false
+		};
+		scene.addLayer(layer);
+		selection.select(layer.id);
+		return layer;
+	}
+
+	function isTypingInEditable(): boolean {
+		const el = document.activeElement as HTMLElement | null;
+		if (!el) return false;
+		const tag = el.tagName;
+		return (
+			tag === 'INPUT' ||
+			tag === 'TEXTAREA' ||
+			tag === 'SELECT' ||
+			el.isContentEditable
+		);
+	}
+
+	function onDocKey(e: KeyboardEvent) {
+		if (isTypingInEditable()) return;
+		const key = e.key.toLowerCase();
+		if (key === 't') {
+			e.preventDefault();
+			addTextLayer();
+		} else if (key === 'delete' || key === 'backspace') {
+			if (selection.ids.length > 0) {
+				e.preventDefault();
+				for (const id of [...selection.ids]) scene.removeLayer(id);
+				selection.clear();
+			}
+		} else if (key === 'escape') {
+			selection.clear();
+		} else if (key === 'arrowleft' || key === 'arrowright' || key === 'arrowup' || key === 'arrowdown') {
+			if (selection.ids.length === 0) return;
+			e.preventDefault();
+			const step = e.shiftKey ? 10 : 1;
+			const dx = key === 'arrowleft' ? -step : key === 'arrowright' ? step : 0;
+			const dy = key === 'arrowup' ? -step : key === 'arrowdown' ? step : 0;
+			for (const id of selection.ids) scene.moveLayer(id, { dx, dy });
+		}
+	}
 </script>
+
+<svelte:document onkeydown={onDocKey} />
 
 <div
 	class="stage-wrap"
