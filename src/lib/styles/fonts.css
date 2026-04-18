@@ -1,1 +1,6 @@
-/* Font-face rules added in the fonts commit. */
+@import '@fontsource/archivo-black/400.css';
+@import '@fontsource-variable/space-grotesk/wght.css';
+@import '@fontsource/dm-mono/400.css';
+@import '@fontsource/dm-mono/500.css';
+@import '@fontsource/caveat/400.css';
+@import '@fontsource/caveat/700.css';
