@@ -47,11 +47,11 @@
 	--ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
 	--ease-snap: cubic-bezier(0.4, 0, 0.2, 1);
 
-	/* Radii — sticker-ish */
-	--radius-sm: 4px;
-	--radius-md: 8px;
-	--radius-lg: 14px;
-	--radius-xl: 22px;
+	/* Radii — sharp, no rounding (matches the offset-shadow aesthetic) */
+	--radius-sm: 0;
+	--radius-md: 0;
+	--radius-lg: 0;
+	--radius-xl: 0;
 }
 
 /* Utilities: neubrutalist card */

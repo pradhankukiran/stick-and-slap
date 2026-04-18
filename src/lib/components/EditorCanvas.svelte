@@ -444,7 +444,7 @@
 		height: var(--h);
 		background: var(--bg);
 		border: 3px solid var(--color-ink);
-		border-radius: 4px;
+		border-radius: 0;
 		box-shadow: 6px 6px 0 var(--color-ink);
 		transform: scale(var(--scale));
 		transform-origin: center center;
@@ -568,7 +568,7 @@
 		font-size: 10px;
 		letter-spacing: 0.16em;
 		text-transform: uppercase;
-		border-radius: 999px;
+		border-radius: 0;
 		pointer-events: none;
 	}
 

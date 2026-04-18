@@ -301,7 +301,7 @@
 		padding: 6px 8px;
 		background: var(--color-paper);
 		border: 2px solid var(--color-ink);
-		border-radius: 4px;
+		border-radius: 0;
 		font-size: 14px;
 		cursor: pointer;
 	}
@@ -321,7 +321,7 @@
 		padding: 6px 10px;
 		background: var(--color-paper);
 		border: 2px solid var(--color-ink);
-		border-radius: 4px;
+		border-radius: 0;
 		font-family: var(--font-data);
 		font-size: 10px;
 		letter-spacing: 0.14em;

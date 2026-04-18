@@ -98,7 +98,7 @@
 		height: 28px;
 		background: var(--c);
 		border: 2px solid var(--color-ink);
-		border-radius: 6px;
+		border-radius: 0;
 		padding: 0;
 		cursor: pointer;
 		transition: transform 120ms var(--ease-bounce), box-shadow 120ms var(--ease-bounce);

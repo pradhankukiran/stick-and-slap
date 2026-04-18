@@ -120,7 +120,7 @@
 		padding: 1px 5px;
 		background: var(--color-yellow);
 		border: 1px solid var(--color-ink);
-		border-radius: 3px;
+		border-radius: 0;
 		font-family: var(--font-data);
 		font-size: 11px;
 	}
@@ -141,7 +141,7 @@
 		grid-template-columns: 1fr auto;
 		align-items: center;
 		padding: 4px 6px;
-		border-radius: 6px;
+		border-radius: 0;
 		border: 2px solid transparent;
 	}
 
@@ -176,7 +176,7 @@
 		font-size: 15px;
 		background: var(--color-paper);
 		border: 2px solid var(--color-ink);
-		border-radius: 4px;
+		border-radius: 0;
 	}
 
 	.name {
@@ -201,7 +201,7 @@
 		padding: 2px 4px;
 		cursor: pointer;
 		font-size: 12px;
-		border-radius: 3px;
+		border-radius: 0;
 		opacity: 0.55;
 	}
 

@@ -335,7 +335,7 @@
 		background: var(--color-yellow);
 		border: calc(2px * var(--cs)) solid var(--color-ink);
 		box-shadow: calc(2px * var(--cs)) calc(2px * var(--cs)) 0 var(--color-ink);
-		border-radius: calc(2px * var(--cs));
+		border-radius: 0;
 		pointer-events: auto;
 		touch-action: none;
 	}

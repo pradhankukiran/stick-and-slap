@@ -191,7 +191,7 @@
 		margin-right: 2px;
 		background: var(--color-paper);
 		border: 2px solid var(--color-ink);
-		border-radius: 4px;
+		border-radius: 0;
 		font-family: var(--font-data);
 		font-size: 10px;
 		box-shadow: 1px 1px 0 var(--color-ink);

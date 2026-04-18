@@ -219,7 +219,7 @@
 		max-height: 360px;
 		object-fit: contain;
 		border: 2px solid var(--color-ink);
-		border-radius: 4px;
+		border-radius: 0;
 		background: #fff;
 		box-shadow: 3px 3px 0 var(--color-ink);
 	}

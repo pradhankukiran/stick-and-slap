@@ -104,7 +104,7 @@
 		text-transform: uppercase;
 		padding: 4px 10px;
 		border: 2px solid var(--color-ink);
-		border-radius: 999px;
+		border-radius: 0;
 		box-shadow: 2px 2px 0 var(--color-ink);
 		transform: rotate(var(--rot, -2deg));
 	}
@@ -202,7 +202,7 @@
 		place-items: center;
 		background: var(--color-paper-deep);
 		border: 2px solid var(--color-ink);
-		border-radius: 4px;
+		border-radius: 0;
 	}
 
 	.preview-inner {
