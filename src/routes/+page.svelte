@@ -7,6 +7,17 @@
 	import Toolbar from '$lib/components/Toolbar.svelte';
 	import LayerPanel from '$lib/components/LayerPanel.svelte';
 	import Inspector from '$lib/components/Inspector.svelte';
+
+	$effect(() => {
+		if (ui.modePicked) {
+			queueMicrotask(() => {
+				const target = document.querySelector<HTMLButtonElement>(
+					'.toolbar button:not(:disabled)'
+				);
+				target?.focus();
+			});
+		}
+	});
 </script>
 
 <svelte:head>
