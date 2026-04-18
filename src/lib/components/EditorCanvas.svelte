@@ -46,8 +46,9 @@
 
 	const fitScale = $derived.by(() => {
 		if (containerWidth === 0 || containerHeight === 0) return 1;
-		const sx = (containerWidth - 80) / scene.width;
-		const sy = (containerHeight - 80) / scene.height;
+		// Leave generous breathing room so the canvas doesn't kiss the side panels.
+		const sx = (containerWidth - 48) / scene.width;
+		const sy = (containerHeight - 48) / scene.height;
 		return Math.min(sx, sy, 1);
 	});
 

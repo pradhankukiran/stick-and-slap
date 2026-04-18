@@ -243,6 +243,8 @@
 		display: grid;
 		place-items: center;
 		padding: 20px 0;
+		min-width: 0;
+		overflow: hidden;
 	}
 
 	.right {
@@ -253,7 +255,7 @@
 		gap: 18px;
 	}
 
-	@media (max-width: 1100px) {
+	@media (max-width: 1280px) {
 		.workbench {
 			grid-template-columns: 1fr;
 		}
