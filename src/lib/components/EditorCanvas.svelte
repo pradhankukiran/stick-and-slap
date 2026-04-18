@@ -54,10 +54,15 @@
 	const scale = $derived(ui.zoom * fitScale);
 
 	onMount(() => {
+		// Seed container dims synchronously so the first paint uses the correct scale.
+		const rect = stageEl.getBoundingClientRect();
+		containerWidth = rect.width;
+		containerHeight = rect.height;
+
 		const ro = new ResizeObserver((entries) => {
-			const rect = entries[0].contentRect;
-			containerWidth = rect.width;
-			containerHeight = rect.height;
+			const r = entries[0].contentRect;
+			containerWidth = r.width;
+			containerHeight = r.height;
 		});
 		ro.observe(stageEl);
 		return () => ro.disconnect();
