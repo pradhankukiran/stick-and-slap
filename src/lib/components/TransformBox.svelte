@@ -24,6 +24,15 @@
 	// Snapshot taken on drag start for math
 	let dragStart: { layers: Array<{ layer: Layer; snapshot: Layer }>; pointer: { x: number; y: number }; rect: { x: number; y: number; w: number; h: number; rotation: number } } | null = null;
 
+	// Track click vs drag on the body overlay so shift-click/dblclick on
+	// the underlying layer still work instead of being swallowed by the box.
+	const CLICK_MOVE_THRESHOLD = 3; // px
+	const CLICK_DURATION_MS = 250;
+	const DBLCLICK_WINDOW_MS = 400;
+	let bodyClickStart: { x: number; y: number; time: number } | null = null;
+	let bodyDidMove = false;
+	let lastBodyClickTime = 0;
+
 	function screenToCanvas(clientX: number, clientY: number, canvasRect: DOMRect): { x: number; y: number } {
 		return {
 			x: (clientX - canvasRect.left) / scale,
@@ -75,7 +84,15 @@
 	function moveHandlers() {
 		return {
 			onstart: (info: DragInfo) => {
-				history.commit();
+				bodyClickStart = { x: info.x, y: info.y, time: Date.now() };
+				bodyDidMove = false;
+				// Do not commit or snapshot yet — only on first real movement, so a
+				// zero-movement click doesn't pollute history or lock state.
+				const anyLocked = selection.layers.some((l) => l.locked);
+				if (anyLocked) {
+					dragStart = null;
+					return;
+				}
 				const layers = selection.layers.map((l) => ({ layer: l, snapshot: { ...l } }));
 				dragStart = {
 					layers,
@@ -85,6 +102,13 @@
 			},
 			ondrag: (info: DragInfo) => {
 				if (!dragStart) return;
+				if (!bodyDidMove && bodyClickStart) {
+					const mdx = Math.abs(info.x - bodyClickStart.x);
+					const mdy = Math.abs(info.y - bodyClickStart.y);
+					if (mdx + mdy < CLICK_MOVE_THRESHOLD) return;
+					bodyDidMove = true;
+					history.commit();
+				}
 				const canvasEl = document.querySelector('.canvas') as HTMLElement | null;
 				if (!canvasEl) return;
 				const rect = canvasEl.getBoundingClientRect();
@@ -117,15 +141,39 @@
 				}
 
 				for (const { snapshot } of dragStart.layers) {
+					if (snapshot.locked) continue;
 					scene.updateLayer(snapshot.id, {
 						x: snapshot.x + dx,
 						y: snapshot.y + dy
 					});
 				}
 			},
-			onend: () => {
+			onend: (info: DragInfo) => {
+				const start = bodyClickStart;
+				const moved = bodyDidMove;
 				dragStart = null;
+				bodyClickStart = null;
+				bodyDidMove = false;
 				ui.activeGuides = [];
+				if (moved || !start) return;
+				const duration = Date.now() - start.time;
+				if (duration > CLICK_DURATION_MS) return;
+				// It was a click, not a drag. Forward to the underlying layer.
+				const primary = selection.primary;
+				if (info.shiftKey && primary) {
+					selection.toggle(primary.id);
+					return;
+				}
+				const now = Date.now();
+				if (now - lastBodyClickTime < DBLCLICK_WINDOW_MS && primary) {
+					lastBodyClickTime = 0;
+					const el = document.querySelector(`[data-id="${primary.id}"]`);
+					el?.dispatchEvent(
+						new MouseEvent('dblclick', { bubbles: true, cancelable: true, clientX: info.x, clientY: info.y })
+					);
+					return;
+				}
+				lastBodyClickTime = now;
 			}
 		};
 	}
