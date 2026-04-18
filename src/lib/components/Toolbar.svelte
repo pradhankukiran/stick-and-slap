@@ -7,9 +7,17 @@
 
 	let fileInput: HTMLInputElement;
 
+	function cascadeOffset() {
+		const n = scene.layers.length;
+		const dx = (n % 6) * 24;
+		const dy = Math.floor(n / 6) * 24 * -1;
+		return { dx, dy };
+	}
+
 	function addText() {
 		const w = 400;
 		const h = 140;
+		const { dx, dy } = cascadeOffset();
 		const layer: TextLayer = {
 			id: makeId('T'),
 			type: 'text',
@@ -20,8 +28,8 @@
 			color: '#0A0A0A',
 			align: 'center',
 			stroke: { color: '#FAFF00', width: 6 },
-			x: (scene.width - w) / 2,
-			y: (scene.height - h) / 2,
+			x: (scene.width - w) / 2 + dx,
+			y: (scene.height - h) / 2 + dy,
 			w,
 			h,
 			rotation: 0,
@@ -44,6 +52,7 @@
 			star: '#FAFF00',
 			arrow: '#2B4FFF'
 		};
+		const { dx, dy } = cascadeOffset();
 		const layer: ShapeLayer = {
 			id: makeId('S'),
 			type: 'shape',
@@ -52,8 +61,8 @@
 			strokeColor: '#0A0A0A',
 			strokeWidth: 6,
 			cornerRadius: kind === 'rect' ? 14 : 0,
-			x: (scene.width - w) / 2,
-			y: (scene.height - h) / 2,
+			x: (scene.width - w) / 2 + dx,
+			y: (scene.height - h) / 2 + dy,
 			w,
 			h,
 			rotation: 0,
