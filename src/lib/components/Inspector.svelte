@@ -9,32 +9,33 @@
 	const primary = $derived(selection.primary);
 	const type = $derived(primary?.type ?? null);
 
-	function commitIfNotEditing() {
+	function onSliderStart() {
 		history.commit();
 	}
 
 	function update<K extends keyof Layer>(field: K, value: unknown) {
 		if (!primary) return;
-		commitIfNotEditing();
 		scene.updateLayer(primary.id, { [field]: value });
 	}
 
 	function updateText(patch: Partial<TextLayer>) {
 		if (!primary || primary.type !== 'text') return;
-		commitIfNotEditing();
 		scene.updateLayer(primary.id, patch);
 	}
 
 	function updateShape(patch: Partial<ShapeLayer>) {
 		if (!primary || primary.type !== 'shape') return;
-		commitIfNotEditing();
 		scene.updateLayer(primary.id, patch);
 	}
 
 	function updateImage(patch: Partial<ImageLayer>) {
 		if (!primary || primary.type !== 'image') return;
-		commitIfNotEditing();
 		scene.updateLayer(primary.id, patch);
+	}
+
+	function commitThen<T>(fn: () => T): T {
+		history.commit();
+		return fn();
 	}
 </script>
 
@@ -51,6 +52,7 @@
 					max="1"
 					step="0.01"
 					value={primary.opacity}
+					onpointerdown={onSliderStart}
 					oninput={(e) => update('opacity', parseFloat((e.target as HTMLInputElement).value))}
 				/>
 				<span class="num">{Math.round(primary.opacity * 100)}%</span>
@@ -63,6 +65,7 @@
 					max="3.1415"
 					step="0.01"
 					value={primary.rotation}
+					onpointerdown={onSliderStart}
 					oninput={(e) =>
 						update('rotation', parseFloat((e.target as HTMLInputElement).value))}
 				/>
@@ -81,7 +84,7 @@
 							class="font-btn"
 							data-active={t.font === f.id}
 							style="font-family: '{f.family}'"
-							onclick={() => updateText({ font: f.id })}
+							onclick={() => commitThen(() => updateText({ font: f.id }))}
 						>
 							{f.label}
 						</button>
@@ -98,6 +101,7 @@
 						max="240"
 						step="1"
 						value={t.size}
+						onpointerdown={onSliderStart}
 						oninput={(e) =>
 							updateText({ size: parseFloat((e.target as HTMLInputElement).value) })}
 					/>
@@ -109,7 +113,7 @@
 				<span class="lbl">color</span>
 				<ColorSwatch
 					value={t.color}
-					onchange={(c) => updateText({ color: c })}
+					onchange={(c) => commitThen(() => updateText({ color: c }))}
 				/>
 			</div>
 
@@ -121,14 +125,16 @@
 						checked={Boolean(t.stroke)}
 						onchange={(e) => {
 							const on = (e.target as HTMLInputElement).checked;
-							updateText({ stroke: on ? { color: '#FAFF00', width: 6 } : undefined });
+							commitThen(() =>
+								updateText({ stroke: on ? { color: '#FAFF00', width: 6 } : undefined })
+							);
 						}}
 					/>
 				</span>
 				{#if t.stroke}
 					<ColorSwatch
 						value={t.stroke.color}
-						onchange={(c) => updateText({ stroke: { ...t.stroke!, color: c } })}
+						onchange={(c) => commitThen(() => updateText({ stroke: { ...t.stroke!, color: c } }))}
 					/>
 					<div class="row">
 						<span class="lbl">width</span>
@@ -138,6 +144,7 @@
 							max="20"
 							step="1"
 							value={t.stroke.width}
+							onpointerdown={onSliderStart}
 							oninput={(e) =>
 								updateText({
 									stroke: {
@@ -159,7 +166,8 @@
 							type="button"
 							class="seg-btn"
 							data-active={t.align === a}
-							onclick={() => updateText({ align: a as 'left' | 'center' | 'right' })}
+							onclick={() =>
+								commitThen(() => updateText({ align: a as 'left' | 'center' | 'right' }))}
 						>{a}</button>
 					{/each}
 				</div>
@@ -170,14 +178,14 @@
 				<span class="lbl">fill</span>
 				<ColorSwatch
 					value={s.fill}
-					onchange={(c) => updateShape({ fill: c })}
+					onchange={(c) => commitThen(() => updateShape({ fill: c }))}
 				/>
 			</div>
 			<div class="section">
 				<span class="lbl">stroke</span>
 				<ColorSwatch
 					value={s.strokeColor}
-					onchange={(c) => updateShape({ strokeColor: c })}
+					onchange={(c) => commitThen(() => updateShape({ strokeColor: c }))}
 				/>
 				<div class="row">
 					<span class="lbl">width</span>
@@ -187,6 +195,7 @@
 						max="20"
 						step="1"
 						value={s.strokeWidth}
+						onpointerdown={onSliderStart}
 						oninput={(e) =>
 							updateShape({ strokeWidth: parseFloat((e.target as HTMLInputElement).value) })}
 					/>
@@ -203,6 +212,7 @@
 							max="80"
 							step="1"
 							value={s.cornerRadius ?? 0}
+							onpointerdown={onSliderStart}
 							oninput={(e) =>
 								updateShape({ cornerRadius: parseFloat((e.target as HTMLInputElement).value) })}
 						/>
@@ -220,7 +230,8 @@
 							type="button"
 							class="seg-btn"
 							data-active={(img.filter ?? 'none') === f}
-							onclick={() => updateImage({ filter: f as 'none' | 'grayscale' })}
+							onclick={() =>
+								commitThen(() => updateImage({ filter: f as 'none' | 'grayscale' }))}
 						>{f}</button>
 					{/each}
 				</div>
