@@ -1,0 +1,90 @@
+@theme {
+	/* Surface */
+	--color-paper: #fdfcf7;
+	--color-paper-deep: #f3f1e6;
+	--color-ink: #0a0a0a;
+	--color-ink-soft: #2a2a2a;
+
+	/* Slap palette — saturated blocks */
+	--color-pink: #ff4fa3;
+	--color-yellow: #faff00;
+	--color-cobalt: #2b4fff;
+	--color-mint: #00e0a4;
+	--color-tangerine: #ff6b2b;
+	--color-lilac: #b388ff;
+	--color-lime: #c6ff4f;
+	--color-cerise: #ff2b6b;
+
+	/* Soft tints for fills behind things */
+	--color-pink-soft: #ffe3ef;
+	--color-yellow-soft: #fffcb8;
+	--color-cobalt-soft: #d9e1ff;
+	--color-mint-soft: #c7fff0;
+
+	/* Fonts */
+	--font-display: 'Archivo Black', 'Impact', sans-serif;
+	--font-ui: 'Space Grotesk Variable', 'Space Grotesk', system-ui, sans-serif;
+	--font-data: 'DM Mono', 'JetBrains Mono', monospace;
+	--font-hand: 'Caveat', 'Comic Sans MS', cursive;
+
+	/* Offset solid shadows — the neubrutalist signature */
+	--shadow-sm: 2px 2px 0 var(--color-ink);
+	--shadow-md: 4px 4px 0 var(--color-ink);
+	--shadow-lg: 6px 6px 0 var(--color-ink);
+	--shadow-xl: 8px 8px 0 var(--color-ink);
+
+	--shadow-pink: 4px 4px 0 var(--color-pink);
+	--shadow-cobalt: 4px 4px 0 var(--color-cobalt);
+	--shadow-mint: 4px 4px 0 var(--color-mint);
+
+	/* Strokes */
+	--stroke-hair: 1px;
+	--stroke-thin: 2px;
+	--stroke-thick: 3px;
+	--stroke-slab: 4px;
+
+	/* Motion */
+	--ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+	--ease-snap: cubic-bezier(0.4, 0, 0.2, 1);
+
+	/* Radii — sticker-ish */
+	--radius-sm: 4px;
+	--radius-md: 8px;
+	--radius-lg: 14px;
+	--radius-xl: 22px;
+}
+
+/* Utilities: neubrutalist card */
+@utility sticky-card {
+	background: var(--color-paper);
+	border: var(--stroke-thick) solid var(--color-ink);
+	box-shadow: var(--shadow-md);
+	border-radius: var(--radius-lg);
+}
+
+/* Utilities: slight peel rotation */
+@utility peel-left {
+	transform: rotate(-1.4deg);
+}
+@utility peel-right {
+	transform: rotate(1.2deg);
+}
+@utility peel-more-left {
+	transform: rotate(-3deg);
+}
+@utility peel-more-right {
+	transform: rotate(2.6deg);
+}
+
+/* Utility: press interaction — pushes into its own shadow */
+@utility press {
+	transition:
+		transform 120ms var(--ease-bounce),
+		box-shadow 120ms var(--ease-bounce);
+}
+
+/* Halftone-ish dot background for decorative areas */
+@utility dotty {
+	background-image: radial-gradient(var(--color-ink) 1px, transparent 1.6px);
+	background-size: 14px 14px;
+}

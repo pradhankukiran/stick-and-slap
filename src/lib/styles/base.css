@@ -1,0 +1,42 @@
+html,
+body {
+	height: 100%;
+	background: var(--color-paper);
+	color: var(--color-ink);
+	font-family: var(--font-ui);
+	font-feature-settings: 'ss01';
+	-webkit-font-smoothing: antialiased;
+	text-rendering: optimizeLegibility;
+	overscroll-behavior: none;
+}
+
+body {
+	margin: 0;
+	min-height: 100dvh;
+}
+
+* {
+	box-sizing: border-box;
+}
+
+::selection {
+	background: var(--color-yellow);
+	color: var(--color-ink);
+}
+
+button {
+	font-family: inherit;
+	color: inherit;
+	cursor: pointer;
+	-webkit-tap-highlight-color: transparent;
+}
+
+button:focus-visible {
+	outline: 3px solid var(--color-cobalt);
+	outline-offset: 3px;
+}
+
+input,
+textarea {
+	font-family: inherit;
+}
