@@ -322,6 +322,7 @@
 		inset: 0;
 		pointer-events: auto;
 		cursor: move;
+		touch-action: none;
 	}
 
 	.handle {
@@ -336,6 +337,7 @@
 		box-shadow: calc(2px * var(--cs)) calc(2px * var(--cs)) 0 var(--color-ink);
 		border-radius: calc(2px * var(--cs));
 		pointer-events: auto;
+		touch-action: none;
 	}
 
 	.rotate-tether {
@@ -362,6 +364,7 @@
 		box-shadow: calc(2px * var(--cs)) calc(2px * var(--cs)) 0 var(--color-ink);
 		cursor: grab;
 		pointer-events: auto;
+		touch-action: none;
 	}
 
 	.rotate-handle:active {

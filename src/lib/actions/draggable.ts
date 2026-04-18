@@ -31,6 +31,8 @@ export const draggable: Action<HTMLElement, DraggableOptions> = (node, params = 
 	let active = false;
 	let pointerId: number | null = null;
 	let priorCursor = '';
+	const priorTouchAction = node.style.touchAction;
+	node.style.touchAction = 'none';
 
 	function infoFrom(e: PointerEvent, dx: number, dy: number): DragInfo {
 		return {
@@ -104,6 +106,7 @@ export const draggable: Action<HTMLElement, DraggableOptions> = (node, params = 
 			window.removeEventListener('pointermove', onPointerMove);
 			window.removeEventListener('pointerup', onPointerUp);
 			window.removeEventListener('pointercancel', onPointerUp);
+			node.style.touchAction = priorTouchAction;
 		}
 	};
 };
