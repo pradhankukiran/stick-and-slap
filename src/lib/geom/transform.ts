@@ -145,14 +145,15 @@ export function applyRotation(
 	currentAngle: number,
 	snap = false
 ): number {
-	let next = initialRotation + (currentAngle - startAngle);
+	let delta = currentAngle - startAngle;
+	if (snap) {
+		const step = Math.PI / 12; // 15°
+		delta = Math.round(delta / step) * step;
+	}
+	let next = initialRotation + delta;
 	// Normalize to [-PI, PI]
 	while (next > Math.PI) next -= 2 * Math.PI;
 	while (next < -Math.PI) next += 2 * Math.PI;
-	if (snap) {
-		const step = Math.PI / 12; // 15°
-		next = Math.round(next / step) * step;
-	}
 	return next;
 }
 
