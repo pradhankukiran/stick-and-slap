@@ -116,13 +116,13 @@
 	.decor-1 {
 		top: 18px;
 		right: 30%;
-		animation: drift 6s ease-in-out infinite alternate;
+		animation: drift 6s ease-in-out 1.2s infinite alternate both;
 	}
 
 	.decor-2 {
 		bottom: 60px;
 		left: 20%;
-		animation: drift 7.2s ease-in-out infinite alternate-reverse;
+		animation: drift 7.2s ease-in-out 1.4s infinite alternate-reverse both;
 	}
 
 	.decor-3 {
