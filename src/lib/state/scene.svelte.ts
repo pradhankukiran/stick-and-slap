@@ -64,7 +64,6 @@ export const PRESETS: Preset[] = [
 	{ id: 'yt', label: 'YouTube Thumb', group: 'social', width: 1280, height: 720, background: '#FDFCF7' },
 	{ id: 'ig', label: 'Instagram Post', group: 'social', width: 1080, height: 1080, background: '#FDFCF7' },
 	{ id: 'story', label: 'IG / TikTok Story', group: 'social', width: 1080, height: 1920, background: '#FDFCF7' },
-	{ id: 'x', label: 'X Post', group: 'social', width: 1600, height: 900, background: '#FDFCF7' },
 	{ id: 'sq', label: 'Square Sticker', group: 'free', width: 800, height: 800, background: '#FDFCF7' }
 ];
 
