@@ -87,16 +87,29 @@ export function applyHandleDrag(
 		}
 	}
 
-	// Center-anchored scaling (Alt/Option)
+	// Center-anchored scaling (Alt/Option): mirror the active edge around
+	// the rect center so the opposite edge moves the same distance.
 	if (fromCenter) {
-		const absW = Math.abs(newW);
-		const absH = Math.abs(newH);
-		left = -absW / 2;
-		right = absW / 2;
-		top = -absH / 2;
-		bottom = absH / 2;
-		newW = absW;
-		newH = absH;
+		if (handle === 'e' || handle === 'ne' || handle === 'se') {
+			right = lx;
+			left = -lx;
+		}
+		if (handle === 'w' || handle === 'nw' || handle === 'sw') {
+			left = lx;
+			right = -lx;
+		}
+		if (handle === 's' || handle === 'se' || handle === 'sw') {
+			bottom = ly;
+			top = -ly;
+		}
+		if (handle === 'n' || handle === 'ne' || handle === 'nw') {
+			top = ly;
+			bottom = -ly;
+		}
+		newW = right - left;
+		newH = bottom - top;
+		if (Math.abs(newW) < minSize) newW = newW < 0 ? -minSize : minSize;
+		if (Math.abs(newH) < minSize) newH = newH < 0 ? -minSize : minSize;
 	}
 
 	// New center in local coords is midpoint of new box
