@@ -56,7 +56,7 @@
 	function remove(id: string) {
 		history.commit();
 		scene.removeLayer(id);
-		if (selection.has(id)) selection.clear();
+		if (selection.has(id)) selection.remove(id);
 	}
 
 	const reversed = $derived([...scene.layers].reverse());

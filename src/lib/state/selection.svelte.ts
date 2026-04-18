@@ -45,6 +45,10 @@ class SelectionState {
 		this.ids = [];
 	}
 
+	remove(id: string) {
+		this.ids = this.ids.filter((x) => x !== id);
+	}
+
 	has(id: string): boolean {
 		return this.ids.includes(id);
 	}
