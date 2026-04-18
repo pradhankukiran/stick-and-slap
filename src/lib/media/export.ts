@@ -138,13 +138,32 @@ function loadImage(src: string): Promise<HTMLImageElement> {
 	});
 }
 
+function wrapLines(ctx: CanvasRenderingContext2D, text: string, maxW: number): string[] {
+	const lines: string[] = [];
+	for (const para of text.split(/\r?\n/)) {
+		const words = para.split(' ');
+		let line = '';
+		for (const w of words) {
+			const test = line ? `${line} ${w}` : w;
+			if (ctx.measureText(test).width <= maxW || line === '') {
+				line = test;
+			} else {
+				lines.push(line);
+				line = w;
+			}
+		}
+		if (line) lines.push(line);
+	}
+	return lines;
+}
+
 function paintText(ctx: CanvasRenderingContext2D, layer: TextLayer) {
 	const font = fontById(layer.font);
 	ctx.font = `${layer.weight} ${layer.size}px "${font.family}", sans-serif`;
 	ctx.textBaseline = 'middle';
 	ctx.textAlign = layer.align === 'left' ? 'left' : layer.align === 'right' ? 'right' : 'center';
 
-	const lines = layer.text.split(/\r?\n/);
+	const lines = wrapLines(ctx, layer.text, layer.w);
 	const lineHeight = layer.size * 1.05;
 	const totalHeight = lines.length * lineHeight;
 	const startY = layer.h / 2 - totalHeight / 2 + lineHeight / 2;
