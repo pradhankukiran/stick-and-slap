@@ -71,6 +71,12 @@
 		else scene.sendBackward(id);
 	}
 
+	function duplicate(id: string) {
+		history.commit();
+		const copy = scene.duplicate(id);
+		if (copy) selection.select(copy.id);
+	}
+
 	const reversed = $derived([...scene.layers].reverse());
 </script>
 
@@ -118,6 +124,14 @@
 							aria-label={l.locked ? 'Unlock' : 'Lock'}
 						>
 							{l.locked ? '🔒' : '🔓'}
+						</button>
+						<button
+							class="icon-btn"
+							onclick={() => duplicate(l.id)}
+							aria-label="Duplicate"
+							title="Duplicate · ⌘D"
+						>
+							⎘
 						</button>
 						<button
 							class="icon-btn del"

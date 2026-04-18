@@ -196,6 +196,38 @@
 			{#snippet children()}<span class="snap">SNAP</span>{/snippet}
 		</StickyButton>
 	</div>
+
+	<div class="divider"></div>
+
+	<div class="group small">
+		<StickyButton
+			color="paper"
+			size="sm"
+			square
+			ariaLabel="Zoom out"
+			onclick={() => ui.setZoom(ui.zoom / 1.2)}
+		>
+			{#snippet children()}<span class="letter">−</span>{/snippet}
+		</StickyButton>
+		<StickyButton
+			color="paper"
+			size="sm"
+			square
+			ariaLabel="Reset zoom"
+			onclick={() => ui.setZoom(1)}
+		>
+			{#snippet children()}<span class="snap">{Math.round(ui.zoom * 100)}</span>{/snippet}
+		</StickyButton>
+		<StickyButton
+			color="paper"
+			size="sm"
+			square
+			ariaLabel="Zoom in"
+			onclick={() => ui.setZoom(ui.zoom * 1.2)}
+		>
+			{#snippet children()}<span class="letter">+</span>{/snippet}
+		</StickyButton>
+	</div>
 </div>
 
 <style>
